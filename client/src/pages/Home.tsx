@@ -6,9 +6,12 @@ import {
   ArrowDownLeft,
   ArrowUpRight,
   BarChart3,
+  Bell,
   Boxes,
   BriefcaseBusiness,
   Check,
+  ChevronDown,
+  CircleDollarSign,
   CreditCard,
   Download,
   FileClock,
@@ -17,17 +20,18 @@ import {
   LayoutDashboard,
   LogOut,
   Menu,
+  Moon,
   Package,
   Plus,
   Printer,
   RefreshCw,
   Settings2,
+  ShieldCheck,
   ShoppingCart,
   Store,
   Truck,
   WalletCards,
   X,
-  Zap,
 } from "lucide-react";
 import { Fragment, FormEvent, ReactNode, useState } from "react";
 import { toast } from "sonner";
@@ -599,102 +603,270 @@ function Products({ owner }: Any) {
 function Dashboard({ owner, data, operations, from, to, setFrom, setTo }: Any) {
   if (!owner)
     return (
-      <Frame title="Operations" eyebrow="Operator workspace">
-        <div className="grid gap-3 md:grid-cols-3">
-          <Kpi
-            label="Assigned deliveries"
-            value={num(operations?.assignedDeliveryCount)}
-            note="Ready for route work"
-            accent="caramel"
-          />
-          <Kpi
-            label="Low stock alerts"
-            value={num(operations?.lowStock?.length)}
-            note="Restock signals"
-          />
-          <Kpi
-            label="Access scope"
-            value="Operator"
-            note="Owner reports hidden"
-            accent="green"
-          />
+      <Frame title="Dashboard" eyebrow="Operator workspace">
+        <div className="reference-card-grid reference-card-grid-three">
+          <div className="reference-stat-card">
+            <span className="reference-stat-label">ASSIGNED DELIVERIES</span>
+            <strong>{num(operations?.assignedDeliveryCount)}</strong>
+            <span>Ready for route work</span>
+          </div>
+          <div className="reference-stat-card">
+            <span className="reference-stat-label">LOW STOCK ALERTS</span>
+            <strong>{num(operations?.lowStock?.length)}</strong>
+            <span>Restock signals</span>
+          </div>
+          <div className="reference-stat-card">
+            <span className="reference-stat-label">ACCESS SCOPE</span>
+            <strong>Operator</strong>
+            <span>Owner reports hidden</span>
+          </div>
         </div>
       </Frame>
     );
+
+  const period = data?.period ?? {},
+    position = data?.position ?? {},
+    rangeDays = Math.max(
+      1,
+      Math.round(
+        (new Date(`${to}T00:00:00`).getTime() -
+          new Date(`${from}T00:00:00`).getTime()) /
+          86400000
+      ) + 1
+    ),
+    soldPacks = Number(period.soldPacks ?? 0),
+    inventoryPacks = Number(position.inventoryPacks ?? 0),
+    velocity = soldPacks / rangeDays,
+    stockoutDays = velocity > 0 ? inventoryPacks / velocity : null,
+    dateRange = `${dateLabel(from)} – ${dateLabel(to)}`,
+    selectedRange = rangeDays <= 8 ? "7" : rangeDays <= 31 ? "30" : "90";
+
   return (
-    <Frame title="Dashboard" eyebrow="Owner overview">
-      <DateFilter {...{ from, to, setFrom, setTo }} />
-      <div className="mt-5 grid gap-3 md:grid-cols-4">
-        <Kpi
-          label="Revenue"
-          value={money(data?.period?.revenueCents)}
-          note={`${num(data?.period?.salesCount)} invoices`}
-        />
-        <Kpi
-          label="Net profit"
-          value={money(data?.period?.netProfitCents)}
-          note="After COGS & operations"
-          accent="green"
-        />
-        <Kpi
-          label="Cash balance"
-          value={money(data?.position?.cashTotalCents)}
-          note="Recorded cash, not profit"
-          accent="caramel"
-        />
-        <Kpi
-          label="Receivables"
-          value={money(data?.position?.accountsReceivableCents)}
-          note="Outstanding store balances"
-        />
+    <div className="reference-dashboard">
+      <div className="reference-dashboard-heading">
+        <div>
+          <p className="reference-eyebrow">DASHBOARD</p>
+          <h1>
+            Good morning, team <span className="reference-info">i</span>
+          </h1>
+          <p className="reference-muted">
+            {new Intl.DateTimeFormat("en-PH", {
+              weekday: "long",
+              month: "long",
+              day: "numeric",
+              year: "numeric",
+            }).format(today)}
+            <span> · Shared business ledger</span>
+          </p>
+        </div>
+        <div className="reference-action-row">
+          <Link href="/sales" className="reference-primary-action">
+            <Plus size={16} />
+            Add daily sale
+          </Link>
+          <button
+            className="reference-secondary-action"
+            onClick={() =>
+              toast.info("Daily close is available from the cash ledger.")
+            }
+          >
+            <Check size={15} />
+            Close day
+          </button>
+          <button
+            className="reference-secondary-action"
+            onClick={() => toast.info("No prior close has been recorded.")}
+          >
+            <RefreshCw size={15} />
+            Reopen last close
+          </button>
+        </div>
       </div>
-      <div className="mt-5 grid gap-4 lg:grid-cols-3">
-        <div className="rounded-2xl border border-[#e7e7f0] bg-white p-5">
-          <h3 className="font-black">Trading</h3>
-          <p className="mt-3 text-sm">
-            Gross profit <b>{money(data?.period?.grossProfitCents)}</b>
-          </p>
-          <p className="mt-2 text-sm">
-            COGS <b>{money(data?.period?.cogsCents)}</b>
-          </p>
-          <p className="mt-2 text-sm">
-            Packs sold <b>{num(data?.period?.soldPacks)}</b>
-          </p>
-        </div>
-        <div className="rounded-2xl border border-[#e7e7f0] bg-white p-5">
-          <h3 className="font-black">Position</h3>
-          <p className="mt-3 text-sm">
-            Inventory <b>{num(data?.position?.inventoryPacks)} packs</b>
-          </p>
-          <p className="mt-2 text-sm">
-            Inventory value <b>{money(data?.position?.inventoryValueCents)}</b>
-          </p>
-          <p className="mt-2 text-sm">
-            Liabilities <b>{money(data?.position?.liabilitiesCents)}</b>
-          </p>
-        </div>
-        <div className="rounded-2xl border border-[#e7e7f0] bg-white p-5">
-          <h3 className="font-black">Low stock</h3>
-          {data?.position?.lowStock?.length ? (
-            data.position.lowStock.slice(0, 5).map((x: Any) => (
-              <p key={x.id} className="mt-3 flex justify-between text-sm">
-                <span>{x.name}</span>
-                <b>
-                  {x.stockPacks} / {x.reorderPacks} packs
-                </b>
+
+      <div className="reference-card-grid reference-card-grid-three">
+        <article className="reference-metric-card">
+          <div className="reference-metric-heading">
+            <span>TODAY'S SALES</span>
+            <CircleDollarSign size={18} />
+          </div>
+          <strong>{money(period.revenueCents)}</strong>
+          <small>{num(soldPacks)} packs sold · selected period</small>
+        </article>
+        <article className="reference-metric-card">
+          <div className="reference-metric-heading">
+            <span>TODAY'S PROFIT</span>
+            <CircleDollarSign size={18} />
+          </div>
+          <strong>{money(period.grossProfitCents)}</strong>
+          <small>Gross profit before operating expenses</small>
+        </article>
+        <article className="reference-metric-card">
+          <div className="reference-metric-heading">
+            <span>INVENTORY</span>
+            <Boxes size={18} />
+          </div>
+          <strong>{num(inventoryPacks)} packs</strong>
+          <small>{money(position.inventoryValueCents)} tied up at cost</small>
+        </article>
+      </div>
+
+      <div className="reference-card-grid reference-card-grid-three reference-card-grid-secondary">
+        <article className="reference-metric-card">
+          <div className="reference-metric-heading">
+            <span>NEXT BOX FUND</span>
+            <WalletCards size={18} />
+          </div>
+          <strong>{money(position.estimatedReinvestmentCents)}</strong>
+          <small>Estimated reinvestment capacity</small>
+        </article>
+        <article className="reference-metric-card">
+          <div className="reference-metric-heading">
+            <span>SELL-THROUGH</span>
+            <BarChart3 size={18} />
+          </div>
+          <strong>
+            {(Number(period.sellThroughBps ?? 0) / 100).toFixed(1)}%
+          </strong>
+          <small>{dateRange} · based on recorded pack movements</small>
+          <div className="reference-progress">
+            <span
+              style={{
+                width: `${Math.min(100, Number(period.sellThroughBps ?? 0) / 100)}%`,
+              }}
+            />
+          </div>
+        </article>
+        <article className="reference-metric-card">
+          <div className="reference-metric-heading">
+            <span>RETAINED EARNINGS</span>
+            <BarChart3 size={18} />
+          </div>
+          <strong>{money(position.retainedEarningsCents)}</strong>
+          <small>Net profit less recorded distributions</small>
+        </article>
+      </div>
+
+      <div className="reference-lower-grid">
+        <section className="reference-panel reference-revenue-panel">
+          <div className="reference-panel-heading">
+            <div>
+              <p className="reference-panel-kicker">REVENUE OVERVIEW</p>
+              <h2>Sales rhythm</h2>
+              <p>{dateRange} · current ledger range</p>
+            </div>
+            <select
+              className="reference-period-select"
+              value={selectedRange}
+              onChange={e => {
+                const days = Number(e.target.value);
+                setFrom(iso(new Date(Date.now() - (days - 1) * 86400000)));
+                setTo(iso(today));
+              }}
+            >
+              <option value="7">Weekly</option>
+              <option value="30">30 days</option>
+              <option value="90">90 days</option>
+            </select>
+          </div>
+          <div className="reference-overview-metrics">
+            <div>
+              <span>Revenue</span>
+              <strong>{money(period.revenueCents)}</strong>
+            </div>
+            <div>
+              <span>Gross profit</span>
+              <strong className="reference-purple-text">
+                {money(period.grossProfitCents)}
+              </strong>
+            </div>
+            <div>
+              <span>Total packs sold</span>
+              <strong>{num(soldPacks)} packs</strong>
+              <small>{num(period.salesCount)} invoices</small>
+            </div>
+            <div>
+              <span>Best day</span>
+              <strong>—</strong>
+              <small>Daily series follows dated sales</small>
+            </div>
+          </div>
+          <div className="reference-chart">
+            <div className="reference-chart-grid">
+              <i />
+              <i />
+              <i />
+              <i />
+              <i />
+            </div>
+            <svg
+              viewBox="0 0 760 170"
+              preserveAspectRatio="none"
+              aria-label="Sales rhythm chart"
+            >
+              <polyline
+                points="8,150 130,150 250,150 370,150 490,150 610,150 752,150"
+                fill="none"
+                stroke="#6552ed"
+                strokeWidth="3"
+                strokeLinecap="round"
+              />
+            </svg>
+            <div className="reference-chart-axis">
+              <span>M</span>
+              <span>T</span>
+              <span>W</span>
+              <span>T</span>
+              <span>F</span>
+              <span>S</span>
+              <span>S</span>
+            </div>
+            {!period.salesCount && (
+              <p className="reference-chart-empty">
+                No dated sales recorded yet.
               </p>
-            ))
-          ) : (
-            <p className="mt-3 text-sm text-[#31704e]">
-              All active products are above reorder levels.
-            </p>
-          )}
-        </div>
+            )}
+          </div>
+        </section>
+
+        <aside className="reference-panel reference-health-panel">
+          <div className="reference-panel-heading">
+            <div>
+              <p className="reference-panel-kicker">BUSINESS HEALTH</p>
+              <h2>At a glance</h2>
+            </div>
+            <ShieldCheck size={19} className="reference-purple-text" />
+          </div>
+          <div className="reference-health-stack">
+            <div>
+              <span>Sales velocity</span>
+              <strong>
+                {velocity ? `${velocity.toFixed(1)} packs/day` : "—"}
+              </strong>
+            </div>
+            <div>
+              <span>Days until stockout</span>
+              <strong>
+                {stockoutDays == null ? "—" : `${stockoutDays.toFixed(1)} days`}
+              </strong>
+            </div>
+            <div>
+              <span>Collection mode</span>
+              <strong className="reference-purple-text">
+                {period.collectionsCents
+                  ? "Recorded collections"
+                  : "No collections yet"}
+              </strong>
+            </div>
+            <div className="reference-health-highlight">
+              <span>Working capital</span>
+              <strong>{money(position.workingCapitalCents)}</strong>
+            </div>
+          </div>
+        </aside>
       </div>
-    </Frame>
+    </div>
   );
 }
-
 function Purchases({ products, role, userId, operators }: Any) {
   const owner = role === "owner",
     api = useApi(),
@@ -3821,6 +3993,7 @@ function Home() {
   const { loading, user, logout } = useAuth(),
     [location] = useLocation(),
     [mobile, setMobile] = useState(false),
+    [moreOpen, setMoreOpen] = useState(false),
     [from, setFrom] = useState(iso(fromDate)),
     [to, setTo] = useState(iso(today)),
     api = useApi(),
@@ -3949,84 +4122,180 @@ function Home() {
           {...{ from, to, setFrom, setTo }}
         />
       );
+  const primaryPaths = [
+      "/",
+      "/sales",
+      "/inventory",
+      "/cash",
+      "/weekly-reports",
+      "/settings",
+    ],
+    primaryNav = nav.filter(
+      (x: Any) => primaryPaths.includes(x.path) && (!x.owner || owner)
+    ),
+    extraNav = nav.filter(
+      (x: Any) => !primaryPaths.includes(x.path) && (!x.owner || owner)
+    ),
+    currentTitle = nav.find(x => x.path === location)?.label ?? "Dashboard";
   return (
-    <div className="min-h-screen bg-[#f8f8ff] text-[#202431]">
+    <div className="reference-app-shell">
       <aside
-        className={`fixed inset-y-0 left-0 z-40 w-[286px] border-r border-[#e1e2ec] bg-[#ffffff] px-4 py-5 transition-transform lg:translate-x-0 ${mobile ? "translate-x-0" : "-translate-x-full"}`}
+        className={`reference-sidebar ${mobile ? "reference-sidebar-open" : ""}`}
       >
-        <div className="flex items-center justify-between px-2">
-          <Link href="/" className="flex items-center gap-3">
-            <img
-              src="/candy-logo.png"
-              alt="CANDY"
-              className="h-11 w-[172px] object-contain object-left"
-            />
+        <div className="reference-brand-row">
+          <Link href="/" className="reference-brand-lockup">
+            <img src="/candy-logo.png" alt="CANDY" />
+            <span>BUSINESS MANAGER</span>
           </Link>
-          <button className="lg:hidden" onClick={() => setMobile(false)}>
-            <X size={18} />
+          <button
+            className="reference-mobile-close lg:hidden"
+            onClick={() => setMobile(false)}
+          >
+            <X size={17} />
           </button>
         </div>
-        <div className="mt-7 space-y-1">
-          {nav
-            .filter((x: Any) => !x.owner || owner)
-            .map(x => (
+        <nav className="reference-sidebar-nav">
+          <p className="reference-nav-heading">OVERVIEW</p>
+          {primaryNav.slice(0, 1).map(x => (
+            <Link
+              key={x.path}
+              href={x.path}
+              onClick={() => setMobile(false)}
+              className={`reference-nav-item ${location === x.path ? "reference-nav-active" : ""}`}
+            >
+              <x.icon size={17} />
+              <span>{x.path === "/" ? "Dashboard" : x.label}</span>
+            </Link>
+          ))}
+          <p className="reference-nav-heading reference-nav-space">
+            OPERATIONS
+          </p>
+          {primaryNav.slice(1, 4).map(x => (
+            <Link
+              key={x.path}
+              href={x.path}
+              onClick={() => setMobile(false)}
+              className={`reference-nav-item ${location === x.path ? "reference-nav-active" : ""}`}
+            >
+              <x.icon size={17} />
+              <span>
+                {x.path === "/cash"
+                  ? "Money"
+                  : x.label.replace(" and Store Accounts", "")}
+              </span>
+            </Link>
+          ))}
+          <p className="reference-nav-heading reference-nav-space">ANALYTICS</p>
+          {primaryNav.slice(4, 5).map(x => (
+            <Link
+              key={x.path}
+              href={x.path}
+              onClick={() => setMobile(false)}
+              className={`reference-nav-item ${location === x.path ? "reference-nav-active" : ""}`}
+            >
+              <x.icon size={17} />
+              <span>Reports</span>
+            </Link>
+          ))}
+          <p className="reference-nav-heading reference-nav-space">SYSTEM</p>
+          {primaryNav.slice(5).map(x => (
+            <Fragment key={x.path}>
               <Link
-                key={x.path}
                 href={x.path}
                 onClick={() => setMobile(false)}
-                className={`flex items-center gap-3 rounded-xl px-3 py-2.5 ${location === x.path ? "bg-[#6c5ce7] text-white shadow-[0_6px_16px_rgba(108,92,231,0.2)]" : "text-[#667085] hover:bg-[#f1f2f8]"}`}
+                className="reference-nav-item"
               >
-                <x.icon size={16} />
-                <span>
-                  <span className="block text-sm font-bold">{x.label}</span>
-                  <span className="block text-[10px] opacity-60">
-                    {x.subtitle}
-                  </span>
-                </span>
+                <Archive size={17} />
+                <span>Data &amp; Backups</span>
               </Link>
-            ))}
-        </div>
-        <div className="absolute bottom-4 left-4 right-4 rounded-2xl border border-[#e7e7f0] bg-white p-3">
-          <p className="truncate text-xs font-bold">
-            {user.name || user.email}
+              <Link
+                href={x.path}
+                onClick={() => setMobile(false)}
+                className={`reference-nav-item ${location === x.path ? "reference-nav-active" : ""}`}
+              >
+                <Settings2 size={17} />
+                <span>Settings</span>
+              </Link>
+            </Fragment>
+          ))}
+          {extraNav.length > 0 && (
+            <>
+              <button
+                className="reference-nav-more"
+                onClick={() => setMoreOpen(!moreOpen)}
+              >
+                <span>More modules</span>
+                <ChevronDown
+                  size={15}
+                  className={moreOpen ? "rotate-180" : ""}
+                />
+              </button>
+              {moreOpen &&
+                extraNav.map(x => (
+                  <Link
+                    key={x.path}
+                    href={x.path}
+                    onClick={() => setMobile(false)}
+                    className={`reference-nav-item reference-nav-extra ${location === x.path ? "reference-nav-active" : ""}`}
+                  >
+                    <x.icon size={16} />
+                    <span>{x.label}</span>
+                  </Link>
+                ))}
+            </>
+          )}
+        </nav>
+        <div className="reference-protected-card">
+          <div className="reference-protected-title">
+            <ShieldCheck size={15} /> Protected history
+          </div>
+          <p>
+            Corrections are logged, and restore previews never change live
+            records.
           </p>
-          <p className="text-[10px] uppercase text-[#758096]">{user.role}</p>
-          <Button
-            variant="outline"
-            className="mt-2 w-full"
+        </div>
+        <div className="reference-sidebar-footer">
+          <button
+            className="reference-lock-button"
             onClick={() => void logout()}
           >
-            <LogOut size={14} />
-            Sign out
-          </Button>
+            <Moon size={15} /> Lock access
+          </button>
+          <span className="reference-user-role">{user.role}</span>
         </div>
       </aside>
-      <div className="lg:pl-[286px]">
-        <header className="sticky top-0 z-30 flex h-[72px] items-center justify-between border-b border-[#e7e7f0] bg-[#f8f8ff]/90 px-5 backdrop-blur lg:px-8">
+      <div className="reference-main-column">
+        <header className="reference-topbar">
           <button
-            className="rounded-xl border bg-white p-2.5 lg:hidden"
+            className="reference-mobile-menu lg:hidden"
             onClick={() => setMobile(true)}
           >
             <Menu size={18} />
           </button>
-          <div>
-            <p className="text-xs font-bold uppercase tracking-[.18em] text-[#f0a34b]">
-              {owner ? "Owner workspace" : "Operator workspace"}
-            </p>
-            <p className="text-sm font-semibold text-[#667085]">
-              Good day, {user.name?.split(" ")[0] ?? "team"}.
-            </p>
+          <div className="reference-topbar-title">
+            <span>WORKSPACE</span>
+            <strong>{currentTitle}</strong>
           </div>
-          <div className="hidden items-center gap-2 text-xs font-semibold text-[#8b93a6] sm:flex">
-            <Zap size={14} className="text-[#f0a34b]" />
-            Live business ledger
+          <div className="reference-topbar-actions">
+            <button aria-label="Toggle theme">
+              <Moon size={17} />
+            </button>
+            <button aria-label="Notifications">
+              <Bell size={17} />
+            </button>
+            <button
+              className="reference-topbar-lock"
+              onClick={() => void logout()}
+            >
+              <ShieldCheck size={15} /> Lock PIN access
+            </button>
           </div>
         </header>
-        <main className="px-5 py-7 lg:px-8">{content}</main>
+        <main className="reference-main-content">{content}</main>
       </div>
       {mobile && (
         <button
-          className="fixed inset-0 z-30 bg-[#202431]/25 lg:hidden"
+          className="reference-overlay lg:hidden"
           onClick={() => setMobile(false)}
           aria-label="Close navigation overlay"
         />
