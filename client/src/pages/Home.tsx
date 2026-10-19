@@ -10,6 +10,7 @@ import {
   BriefcaseBusiness,
   Check,
   CreditCard,
+  Download,
   FileClock,
   FileText,
   Gem,
@@ -18,9 +19,9 @@ import {
   Menu,
   Package,
   Plus,
+  Printer,
   RefreshCw,
   Settings2,
-  ShoppingBag,
   ShoppingCart,
   Store,
   Truck,
@@ -144,7 +145,7 @@ function Field({
       <span>{label}</span>
       <input
         {...p}
-        className="h-10 rounded-xl border border-[#deddea] bg-white px-3 text-sm font-normal tracking-normal text-[#202431] outline-none focus:border-[#783f55] focus:ring-2 focus:ring-[#783f55]/15"
+        className="h-10 rounded-xl border border-[#deddea] bg-white px-3 text-sm font-normal tracking-normal text-[#202431] outline-none focus:border-[#6c5ce7] focus:ring-2 focus:ring-[#6c5ce7]/15"
       />
     </label>
   );
@@ -159,7 +160,7 @@ function SelectField({
       <span>{label}</span>
       <select
         {...p}
-        className="h-10 rounded-xl border border-[#deddea] bg-white px-3 text-sm font-normal tracking-normal text-[#202431] outline-none focus:border-[#783f55]"
+        className="h-10 rounded-xl border border-[#deddea] bg-white px-3 text-sm font-normal tracking-normal text-[#202431] outline-none focus:border-[#6c5ce7]"
       >
         {children}
       </select>
@@ -379,9 +380,13 @@ function Holder({
 function Products({ owner }: Any) {
   const [show, setShow] = useState(false),
     [edit, setEdit] = useState<Any>(null),
+    [search, setSearch] = useState(""),
     [f, setF] = useState<Any>({ reorder: "10" });
   const api = useApi(),
-    q = api.products.list.useQuery({ activeOnly: false }),
+    q = api.products.list.useQuery({
+      activeOnly: false,
+      search: search.trim() || undefined,
+    }),
     u = trpc.useUtils(),
     create = api.products.create.useMutation({
       onSuccess: () => {
@@ -531,6 +536,14 @@ function Products({ owner }: Any) {
           </div>
         </form>
       )}
+      <div className="mb-5 max-w-md">
+        <Field
+          label="Search catalog"
+          placeholder="SKU, product name, or variety"
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+        />
+      </div>
       {q.isLoading ? (
         <Loading />
       ) : q.data?.length ? (
@@ -689,6 +702,9 @@ function Purchases({ products, role, userId, operators }: Any) {
     defaultLocation = "Divisoria, Philippines";
   const [show, setShow] = useState(false),
     [assignments, setAssignments] = useState<Record<string, string>>({}),
+    [search, setSearch] = useState(""),
+    [from, setFrom] = useState(iso(fromDate)),
+    [to, setTo] = useState(iso(today)),
     [payForm, setPayForm] = useState<Any>(null);
   const [f, setF] = useState<Any>({
     supplier: "",
@@ -704,7 +720,11 @@ function Purchases({ products, role, userId, operators }: Any) {
     cashLocation: "owner",
     operator: "",
   });
-  const q = api.purchases.list.useQuery({}),
+  const q = api.purchases.list.useQuery({
+      search: search.trim() || undefined,
+      from: dateAt(from),
+      to: new Date(`${to}T23:59:59`),
+    }),
     settings = api.settings.get.useQuery(undefined, { enabled: owner });
   const create = api.purchases.create.useMutation({
     onSuccess: () => {
@@ -846,6 +866,15 @@ function Purchases({ products, role, userId, operators }: Any) {
         </Button>
       }
     >
+      <DateFilter {...{ from, to, setFrom, setTo }} />
+      <div className="mb-5 mt-5 max-w-md">
+        <Field
+          label="Search purchases"
+          placeholder="Purchase number or supplier"
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+        />
+      </div>
       {show && (
         <form
           onSubmit={submit}
@@ -954,7 +983,7 @@ function Purchases({ products, role, userId, operators }: Any) {
           <label className="grid gap-1.5 text-xs font-bold uppercase tracking-[.12em] text-[#758096] md:col-span-3">
             <span>Notes</span>
             <textarea
-              className="min-h-10 rounded-xl border border-[#deddea] bg-white px-3 py-2 text-sm font-normal normal-case tracking-normal text-[#202431] outline-none focus:border-[#783f55] focus:ring-2 focus:ring-[#783f55]/15"
+              className="min-h-10 rounded-xl border border-[#deddea] bg-white px-3 py-2 text-sm font-normal normal-case tracking-normal text-[#202431] outline-none focus:border-[#6c5ce7] focus:ring-2 focus:ring-[#6c5ce7]/15"
               value={f.notes}
               onChange={e => setF({ ...f, notes: e.target.value })}
             />
@@ -1284,6 +1313,9 @@ function Purchases({ products, role, userId, operators }: Any) {
 function Sales({ products, owner, role, userId, operators }: Any) {
   const [show, setShow] = useState(false),
     [showCustomer, setShowCustomer] = useState(false),
+    [search, setSearch] = useState(""),
+    [from, setFrom] = useState(iso(fromDate)),
+    [to, setTo] = useState(iso(today)),
     [customerForm, setCustomerForm] = useState<Any>({}),
     [f, setF] = useState<Any>({
       saleDate: iso(today),
@@ -1294,7 +1326,11 @@ function Sales({ products, owner, role, userId, operators }: Any) {
   const api = useApi(),
     u = trpc.useUtils(),
     customers = api.customers.list.useQuery({}),
-    q = api.sales.list.useQuery({}),
+    q = api.sales.list.useQuery({
+      search: search.trim() || undefined,
+      from: dateAt(from),
+      to: new Date(`${to}T23:59:59`),
+    }),
     createCustomer = api.customers.create.useMutation({
       onSuccess: () => {
         toast.success("Store account added");
@@ -1445,6 +1481,15 @@ function Sales({ products, owner, role, userId, operators }: Any) {
         </div>
       }
     >
+      <DateFilter {...{ from, to, setFrom, setTo }} />
+      <div className="mb-5 mt-5 max-w-md">
+        <Field
+          label="Search sales and stores"
+          placeholder="Invoice number or store name"
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+        />
+      </div>
       {showCustomer && (
         <form
           onSubmit={submitCustomer}
@@ -1481,7 +1526,7 @@ function Sales({ products, owner, role, userId, operators }: Any) {
           <label className="grid gap-1.5 text-xs font-bold uppercase tracking-[.12em] text-[#758096] md:col-span-3">
             <span>Notes</span>
             <textarea
-              className="min-h-10 rounded-xl border border-[#deddea] bg-white px-3 py-2 text-sm font-normal normal-case tracking-normal text-[#202431] outline-none focus:border-[#783f55]"
+              className="min-h-10 rounded-xl border border-[#deddea] bg-white px-3 py-2 text-sm font-normal normal-case tracking-normal text-[#202431] outline-none focus:border-[#6c5ce7]"
               value={customerForm.notes || ""}
               onChange={e =>
                 setCustomerForm({ ...customerForm, notes: e.target.value })
@@ -1839,8 +1884,9 @@ function Sales({ products, owner, role, userId, operators }: Any) {
   );
 }
 function Inventory({ owner }: Any) {
-  const api = useApi(),
-    q = api.inventory.list.useQuery({}),
+  const [search, setSearch] = useState(""),
+    api = useApi(),
+    q = api.inventory.list.useQuery({ search: search.trim() || undefined }),
     u = trpc.useUtils(),
     count = api.inventory.count.useMutation({
       onSuccess: () => {
@@ -1862,6 +1908,14 @@ function Inventory({ owner }: Any) {
       <p className="mb-4 rounded-xl bg-[#ffffff] px-4 py-3 text-sm text-[#758096]">
         Quantities are **pack units**, not individual pieces. Money is PHP.
       </p>
+      <div className="mb-5 max-w-md">
+        <Field
+          label="Search inventory"
+          placeholder="SKU or product name"
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+        />
+      </div>
       {q.isLoading ? (
         <Loading />
       ) : q.data?.length ? (
@@ -3067,7 +3121,7 @@ function Expenses({ role, userId, operators }: Any) {
                               reason: e.target.value,
                             })
                           }
-                          className="rounded-xl border border-[#deddea] bg-white px-3 py-2 text-sm font-normal normal-case tracking-normal text-[#202431] outline-none focus:border-[#783f55] focus:ring-2 focus:ring-[#783f55]/15"
+                          className="rounded-xl border border-[#deddea] bg-white px-3 py-2 text-sm font-normal normal-case tracking-normal text-[#202431] outline-none focus:border-[#6c5ce7] focus:ring-2 focus:ring-[#6c5ce7]/15"
                         />
                       </label>
                       <div className="flex items-end gap-2 lg:col-span-5">
@@ -3498,8 +3552,71 @@ function Capital({ operators }: Any) {
   );
 }
 function Reports({ weekly, dashboard, title }: Any) {
+  const range = dashboard?.selectedRange,
+    rangeLabel =
+      range?.from && range?.to
+        ? `${dateLabel(range.from)} – ${dateLabel(range.to)}`
+        : "Selected reporting period",
+    exportCsv = () => {
+      const quote = (value: unknown) =>
+        `"${String(value ?? "").replaceAll('"', '""')}"`;
+      const rows = [
+        ["Candy Distribution Manager", title],
+        ["Period", rangeLabel],
+        [],
+        ["Metric", "Amount (PHP)"],
+        ["Revenue", money(dashboard?.period?.revenueCents)],
+        ["Cost of goods sold", money(dashboard?.period?.cogsCents)],
+        ["Gross profit", money(dashboard?.period?.grossProfitCents)],
+        [
+          "Operating expenses",
+          money(dashboard?.period?.operatingExpensesCents),
+        ],
+        ["Net profit", money(dashboard?.period?.netProfitCents)],
+        ["Customer collections", money(dashboard?.period?.collectionsCents)],
+        ["Customer return credits", money(weekly?.returnCreditsCents)],
+        [],
+        ["Product", "Packs", "Revenue (PHP)"],
+        ...(weekly?.productBreakdown ?? []).map((item: Any) => [
+          item.name,
+          item.packs,
+          money(item.revenueCents),
+        ]),
+      ];
+      const csv = rows.map(row => row.map(quote).join(",")).join("\n");
+      const url = URL.createObjectURL(
+        new Blob([csv], { type: "text/csv;charset=utf-8" })
+      );
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `${title.toLowerCase().replaceAll(/[^a-z0-9]+/g, "-")}-${iso(today)}.csv`;
+      link.click();
+      URL.revokeObjectURL(url);
+    };
   return (
-    <Frame title={title} eyebrow="Owner reporting">
+    <Frame
+      title={title}
+      eyebrow="Owner reporting"
+      action={
+        <div className="flex flex-wrap items-center gap-2 print:hidden">
+          <Button variant="outline" onClick={exportCsv}>
+            <Download size={15} />
+            Export CSV
+          </Button>
+          <Button variant="outline" onClick={() => window.print()}>
+            <Printer size={15} />
+            Print report
+          </Button>
+        </div>
+      }
+    >
+      <p className="mb-5 text-sm text-[#758096]">
+        Reporting period:{" "}
+        <span className="font-semibold text-[#202431]">{rangeLabel}</span>
+        <span className="ml-2 rounded-full bg-[#eeecff] px-2 py-1 text-xs font-bold text-[#5145b8]">
+          PHP · calculated from recorded transactions
+        </span>
+      </p>
       <div className="grid gap-3 md:grid-cols-3">
         <Kpi
           label="Revenue"

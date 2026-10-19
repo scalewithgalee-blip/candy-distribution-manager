@@ -1,9 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Candy Distribution Manager mark">
-  <rect width="64" height="64" rx="17" fill="#713b52"/>
-  <path d="M18 17h23l7 7v25H18z" fill="#fffaf4" stroke="#e8d5c5" stroke-width="2" stroke-linejoin="round"/>
-  <path d="M41 17v8h7" fill="none" stroke="#c58a57" stroke-width="2" stroke-linejoin="round"/>
-  <path d="M24 31h17M24 37h17M24 43h10" fill="none" stroke="#713b52" stroke-width="3" stroke-linecap="round"/>
-  <path d="M13 23l5-4v9l-5-3zM51 23l-5-4v9l5-3z" fill="#c58a57"/>
-  <circle cx="18" cy="23.5" r="2.4" fill="#f4d5a6"/>
-  <circle cx="46" cy="23.5" r="2.4" fill="#f4d5a6"/>
-</svg>

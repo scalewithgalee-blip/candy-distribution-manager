@@ -125,4 +125,17 @@
       animation-duration: 0.01ms !important;
     }
   }
+  @media print {
+    body {
+      background: #ffffff !important;
+    }
+    aside,
+    header,
+    .print\:hidden {
+      display: none !important;
+    }
+    main {
+      padding: 0 !important;
+    }
+  }
 }
