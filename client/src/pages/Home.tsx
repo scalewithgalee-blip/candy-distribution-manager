@@ -592,7 +592,16 @@ function Products({ owner }: Any) {
     </Frame>
   );
 }
-function Dashboard({ owner, data, operations, from, to, setFrom, setTo }: Any) {
+function Dashboard({
+  owner,
+  data,
+  operations,
+  salesRows,
+  from,
+  to,
+  setFrom,
+  setTo,
+}: Any) {
   if (!owner)
     return (
       <Frame title="Dashboard" eyebrow="Operator workspace">
@@ -626,12 +635,47 @@ function Dashboard({ owner, data, operations, from, to, setFrom, setTo }: Any) {
           86400000
       ) + 1
     ),
+    rows = Array.isArray(salesRows) ? salesRows : [],
     soldPacks = Number(period.soldPacks ?? 0),
     inventoryPacks = Number(position.inventoryPacks ?? 0),
     velocity = soldPacks / rangeDays,
     stockoutDays = velocity > 0 ? inventoryPacks / velocity : null,
     dateRange = `${dateLabel(from)} – ${dateLabel(to)}`,
-    selectedRange = rangeDays <= 8 ? "7" : rangeDays <= 31 ? "30" : "90";
+    selectedRange = rangeDays <= 8 ? "7" : rangeDays <= 31 ? "30" : "90",
+    daily = Array.from({ length: 7 }, (_, index) => {
+      const day = new Date(`${to}T00:00:00`);
+      day.setDate(day.getDate() - (6 - index));
+      const key = iso(day);
+      const dayRows = rows.filter(
+        (sale: Any) => iso(new Date(String(sale.saleDate))) === key
+      );
+      return {
+        key,
+        label: new Intl.DateTimeFormat("en-PH", { weekday: "short" })
+          .format(day)
+          .slice(0, 1),
+        revenueCents: dayRows.reduce(
+          (sum: number, sale: Any) => sum + Number(sale.totalCents ?? 0),
+          0
+        ),
+        collectionsCents: dayRows.reduce(
+          (sum: number, sale: Any) => sum + Number(sale.collectionsCents ?? 0),
+          0
+        ),
+        packs: dayRows.reduce(
+          (sum: number, sale: Any) =>
+            sum +
+            (sale.lines ?? []).reduce(
+              (lineSum: number, line: Any) => lineSum + Number(line.packs ?? 0),
+              0
+            ),
+          0
+        ),
+      };
+    }),
+    maxRevenue = Math.max(1, ...daily.map(day => day.revenueCents)),
+    maxCollections = Math.max(1, ...daily.map(day => day.collectionsCents)),
+    recentSales = rows.slice(0, 6);
 
   return (
     <div className="reference-dashboard">
@@ -675,76 +719,52 @@ function Dashboard({ owner, data, operations, from, to, setFrom, setTo }: Any) {
         </div>
       </div>
 
-      <div className="reference-card-grid reference-card-grid-three">
+      <div className="reference-card-grid reference-card-grid-four">
         <article className="reference-metric-card">
           <div className="reference-metric-heading">
-            <span>TODAY'S SALES</span>
-            <CircleDollarSign size={18} />
+            <span>TOTAL SALES</span>
+            <CircleDollarSign size={17} />
           </div>
           <strong>{money(period.revenueCents)}</strong>
-          <small>{num(soldPacks)} packs sold · selected period</small>
+          <small>
+            {num(period.salesCount)} invoices · {num(soldPacks)} packs
+          </small>
         </article>
         <article className="reference-metric-card">
           <div className="reference-metric-heading">
-            <span>TODAY'S PROFIT</span>
-            <CircleDollarSign size={18} />
+            <span>GROSS PROFIT</span>
+            <BarChart3 size={17} />
           </div>
           <strong>{money(period.grossProfitCents)}</strong>
-          <small>Gross profit before operating expenses</small>
+          <small>{money(period.cogsCents)} COGS in selected range</small>
         </article>
         <article className="reference-metric-card">
           <div className="reference-metric-heading">
             <span>INVENTORY</span>
-            <Boxes size={18} />
+            <Boxes size={17} />
           </div>
           <strong>{num(inventoryPacks)} packs</strong>
-          <small>{money(position.inventoryValueCents)} tied up at cost</small>
+          <small>
+            {money(position.inventoryValueCents)} at weighted-average cost
+          </small>
+        </article>
+        <article className="reference-metric-card">
+          <div className="reference-metric-heading">
+            <span>RECEIVABLES</span>
+            <WalletCards size={17} />
+          </div>
+          <strong>{money(position.accountsReceivableCents)}</strong>
+          <small>{money(position.cashTotalCents)} cash recorded</small>
         </article>
       </div>
 
-      <div className="reference-card-grid reference-card-grid-three reference-card-grid-secondary">
-        <article className="reference-metric-card">
-          <div className="reference-metric-heading">
-            <span>NEXT BOX FUND</span>
-            <WalletCards size={18} />
-          </div>
-          <strong>{money(position.estimatedReinvestmentCents)}</strong>
-          <small>Estimated reinvestment capacity</small>
-        </article>
-        <article className="reference-metric-card">
-          <div className="reference-metric-heading">
-            <span>SELL-THROUGH</span>
-            <BarChart3 size={18} />
-          </div>
-          <strong>
-            {(Number(period.sellThroughBps ?? 0) / 100).toFixed(1)}%
-          </strong>
-          <small>{dateRange} · based on recorded pack movements</small>
-          <div className="reference-progress">
-            <span
-              style={{
-                width: `${Math.min(100, Number(period.sellThroughBps ?? 0) / 100)}%`,
-              }}
-            />
-          </div>
-        </article>
-        <article className="reference-metric-card">
-          <div className="reference-metric-heading">
-            <span>RETAINED EARNINGS</span>
-            <BarChart3 size={18} />
-          </div>
-          <strong>{money(position.retainedEarningsCents)}</strong>
-          <small>Net profit less recorded distributions</small>
-        </article>
-      </div>
-
-      <div className="reference-lower-grid">
-        <section className="reference-panel reference-revenue-panel">
+      <div className="peopledesk-analytics-grid">
+        <section className="reference-panel peopledesk-analytics-card">
           <div className="reference-panel-heading">
             <div>
-              <p className="reference-panel-kicker">REVENUE OVERVIEW</p>
+              <p className="reference-panel-kicker">SALES ANALYTICS</p>
               <h2>Sales rhythm</h2>
-              <p>{dateRange} · current ledger range</p>
+              <p>{dateRange} · daily revenue</p>
             </div>
             <select
               className="reference-period-select"
@@ -760,102 +780,152 @@ function Dashboard({ owner, data, operations, from, to, setFrom, setTo }: Any) {
               <option value="90">90 days</option>
             </select>
           </div>
-          <div className="reference-overview-metrics">
-            <div>
-              <span>Revenue</span>
-              <strong>{money(period.revenueCents)}</strong>
-            </div>
-            <div>
-              <span>Gross profit</span>
-              <strong className="reference-purple-text">
-                {money(period.grossProfitCents)}
-              </strong>
-            </div>
-            <div>
-              <span>Total packs sold</span>
-              <strong>{num(soldPacks)} packs</strong>
-              <small>{num(period.salesCount)} invoices</small>
-            </div>
-            <div>
-              <span>Best day</span>
-              <strong>—</strong>
-              <small>Daily series follows dated sales</small>
-            </div>
+          <div className="peopledesk-chart-summary">
+            <strong>{money(period.revenueCents)}</strong>
+            <span>
+              {velocity
+                ? `${velocity.toFixed(1)} packs/day`
+                : "No sales velocity yet"}
+            </span>
           </div>
-          <div className="reference-chart">
-            <div className="reference-chart-grid">
-              <i />
-              <i />
-              <i />
-              <i />
-              <i />
-            </div>
-            <svg
-              viewBox="0 0 760 170"
-              preserveAspectRatio="none"
-              aria-label="Sales rhythm chart"
-            >
-              <polyline
-                points="8,150 130,150 250,150 370,150 490,150 610,150 752,150"
-                fill="none"
-                stroke="#6552ed"
-                strokeWidth="3"
-                strokeLinecap="round"
-              />
-            </svg>
-            <div className="reference-chart-axis">
-              <span>M</span>
-              <span>T</span>
-              <span>W</span>
-              <span>T</span>
-              <span>F</span>
-              <span>S</span>
-              <span>S</span>
-            </div>
-            {!period.salesCount && (
-              <p className="reference-chart-empty">
-                No dated sales recorded yet.
-              </p>
-            )}
+          <div
+            className="peopledesk-bars"
+            aria-label="Daily sales revenue bars"
+          >
+            {daily.map(day => (
+              <div className="peopledesk-bar-column" key={day.key}>
+                <span className="peopledesk-bar-value">
+                  {day.revenueCents ? money(day.revenueCents) : ""}
+                </span>
+                <div className="peopledesk-bar-track">
+                  <i
+                    style={{
+                      height: `${day.revenueCents ? Math.max(8, (day.revenueCents / maxRevenue) * 100) : 0}%`,
+                    }}
+                  />
+                </div>
+                <small>{day.label}</small>
+              </div>
+            ))}
           </div>
+          {!rows.length && (
+            <p className="peopledesk-chart-empty">
+              No dated sales recorded yet.
+            </p>
+          )}
         </section>
 
-        <aside className="reference-panel reference-health-panel">
+        <section className="reference-panel peopledesk-analytics-card">
           <div className="reference-panel-heading">
             <div>
-              <p className="reference-panel-kicker">BUSINESS HEALTH</p>
-              <h2>At a glance</h2>
+              <p className="reference-panel-kicker">CASH ANALYTICS</p>
+              <h2>Collection report</h2>
+              <p>Collections linked to completed sales</p>
             </div>
-            <ShieldCheck size={19} className="reference-purple-text" />
+            <CircleDollarSign size={18} className="reference-purple-text" />
           </div>
-          <div className="reference-health-stack">
-            <div>
-              <span>Sales velocity</span>
-              <strong>
-                {velocity ? `${velocity.toFixed(1)} packs/day` : "—"}
-              </strong>
-            </div>
-            <div>
-              <span>Days until stockout</span>
-              <strong>
-                {stockoutDays == null ? "—" : `${stockoutDays.toFixed(1)} days`}
-              </strong>
-            </div>
-            <div>
-              <span>Collection mode</span>
-              <strong className="reference-purple-text">
-                {period.collectionsCents
-                  ? "Recorded collections"
-                  : "No collections yet"}
-              </strong>
-            </div>
-            <div className="reference-health-highlight">
-              <span>Working capital</span>
-              <strong>{money(position.workingCapitalCents)}</strong>
-            </div>
+          <div className="peopledesk-chart-summary">
+            <strong>{money(period.collectionsCents)}</strong>
+            <span>
+              {position.remittanceOutstandingCents
+                ? money(position.remittanceOutstandingCents) +
+                  " operator remittance"
+                : "No outstanding remittance"}
+            </span>
           </div>
-        </aside>
+          <div
+            className="peopledesk-bars peopledesk-bars-compact"
+            aria-label="Daily collection bars"
+          >
+            {daily.map(day => (
+              <div className="peopledesk-bar-column" key={day.key}>
+                <span className="peopledesk-bar-value">
+                  {day.collectionsCents ? money(day.collectionsCents) : ""}
+                </span>
+                <div className="peopledesk-bar-track">
+                  <i
+                    className="peopledesk-bar-green"
+                    style={{
+                      height: `${day.collectionsCents ? Math.max(8, (day.collectionsCents / maxCollections) * 100) : 0}%`,
+                    }}
+                  />
+                </div>
+                <small>{day.label}</small>
+              </div>
+            ))}
+          </div>
+          {!rows.length && (
+            <p className="peopledesk-chart-empty">
+              Collections appear here after payments are recorded.
+            </p>
+          )}
+        </section>
       </div>
+
+      <section className="reference-panel peopledesk-table-panel">
+        <div className="reference-panel-heading">
+          <div>
+            <p className="reference-panel-kicker">OPERATIONS</p>
+            <h2>Recent sales</h2>
+            <p>Latest completed invoices in the selected range</p>
+          </div>
+          <Link href="/sales" className="reference-secondary-action">
+            View all sales
+          </Link>
+        </div>
+        <div className="mt-4">
+          <Table
+            headers={[
+              "Date",
+              "Store",
+              "Packs",
+              "Invoice",
+              "Collected",
+              "Status",
+              "Action",
+            ]}
+          >
+            {recentSales.length ? (
+              recentSales.map((sale: Any) => {
+                const packs = (sale.lines ?? []).reduce(
+                  (sum: number, line: Any) => sum + Number(line.packs ?? 0),
+                  0
+                );
+                return (
+                  <tr key={sale.id}>
+                    <td className="px-4 py-3 text-[#6e747d]">
+                      {dateLabel(sale.saleDate)}
+                    </td>
+                    <td className="px-4 py-3 font-semibold">
+                      {sale.storeName}
+                    </td>
+                    <td className="px-4 py-3">{num(packs)} packs</td>
+                    <td className="px-4 py-3 font-semibold">
+                      {money(sale.totalCents)}
+                    </td>
+                    <td className="px-4 py-3">
+                      {money(sale.collectionsCents)}
+                    </td>
+                    <td className="px-4 py-3">
+                      <Pill value={sale.deliveryStatus ?? "completed"} />
+                    </td>
+                    <td className="px-4 py-3 text-[#9aa0a8]">···</td>
+                  </tr>
+                );
+              })
+            ) : (
+              <tr>
+                <td
+                  colSpan={7}
+                  className="px-4 py-10 text-center text-sm text-[#9aa0a8]"
+                >
+                  No completed sales in this period.
+                </td>
+              </tr>
+            )}
+          </Table>
+        </div>
+      </section>
     </div>
   );
 }
@@ -4000,6 +4070,7 @@ function Home() {
       enabled: enabled && owner,
     }),
     weekly = api.reports.weekly.useQuery(range, { enabled: enabled && owner }),
+    salesRows = api.sales.list.useQuery(range, { enabled: enabled && owner }),
     ops = api.operations.summary.useQuery(undefined, {
       enabled: enabled && !owner,
     });
@@ -4042,6 +4113,7 @@ function Home() {
           owner={owner}
           data={dashboard.data}
           operations={ops.data}
+          salesRows={salesRows.data ?? []}
           {...{ from, to, setFrom, setTo }}
         />
       ) : location === "/products" ? (
