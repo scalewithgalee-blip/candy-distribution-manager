@@ -145,11 +145,11 @@ function Field({
   ...p
 }: React.InputHTMLAttributes<HTMLInputElement> & { label: string }) {
   return (
-    <label className="grid gap-1.5 text-xs font-bold uppercase tracking-[.12em] text-[#758096]">
+    <label className="people-field grid gap-1.5 text-xs font-bold uppercase tracking-[.12em] text-[#758096]">
       <span>{label}</span>
       <input
         {...p}
-        className="h-10 rounded-xl border border-[#deddea] bg-white px-3 text-sm font-normal tracking-normal text-[#202431] outline-none focus:border-[#6c5ce7] focus:ring-2 focus:ring-[#6c5ce7]/15"
+        className="h-10 rounded-xl border border-[#deddea] bg-white px-3 text-sm font-normal tracking-normal text-[#202431] outline-none focus:border-[#202431] focus:ring-2 focus:ring-[#202431]/10"
       />
     </label>
   );
@@ -160,11 +160,11 @@ function SelectField({
   ...p
 }: React.SelectHTMLAttributes<HTMLSelectElement> & { label: string }) {
   return (
-    <label className="grid gap-1.5 text-xs font-bold uppercase tracking-[.12em] text-[#758096]">
+    <label className="people-field grid gap-1.5 text-xs font-bold uppercase tracking-[.12em] text-[#758096]">
       <span>{label}</span>
       <select
         {...p}
-        className="h-10 rounded-xl border border-[#deddea] bg-white px-3 text-sm font-normal tracking-normal text-[#202431] outline-none focus:border-[#6c5ce7]"
+        className="h-10 rounded-xl border border-[#deddea] bg-white px-3 text-sm font-normal tracking-normal text-[#202431] outline-none focus:border-[#202431]"
       >
         {children}
       </select>
@@ -198,10 +198,10 @@ function Button({
   variant?: "primary" | "quiet" | "outline" | "danger";
 }) {
   const s = {
-    primary: "bg-[#6c5ce7] text-white hover:bg-[#5946d8]",
-    quiet: "bg-[#eeecff] text-[#6c5ce7]",
-    outline: "border border-[#dcd9ea] bg-white text-[#5145b8]",
-    danger: "bg-[#fff0f0] text-[#a13d3d]",
+    primary: "bg-[#1d1e22] text-white hover:bg-[#34363b]",
+    quiet: "bg-[#edf8df] text-[#315d30]",
+    outline: "border border-[#dfe3e8] bg-white text-[#4c515b]",
+    danger: "bg-[#fff0ef] text-[#a24743]",
   };
   return (
     <button
@@ -224,10 +224,10 @@ function Frame({
   children: ReactNode;
 }) {
   return (
-    <div className="mx-auto max-w-[1480px]">
-      <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
+    <div className="people-page mx-auto max-w-[1480px]">
+      <div className="people-page-header mb-6 flex flex-wrap items-end justify-between gap-3">
         <div>
-          <p className="text-xs font-bold uppercase tracking-[.2em] text-[#f0a34b]">
+          <p className="people-page-kicker text-xs font-bold uppercase tracking-[.2em] text-[#8b919d]">
             {eyebrow}
           </p>
           <h1 className="mt-1 text-3xl font-black tracking-[-.04em] text-[#202431]">
@@ -248,9 +248,9 @@ function Table({
   children: ReactNode;
 }) {
   return (
-    <div className="overflow-x-auto rounded-2xl border border-[#e7e7f0] bg-white">
+    <div className="people-table overflow-x-auto rounded-2xl border border-[#e7e7f0] bg-white">
       <table className="min-w-full text-left text-sm">
-        <thead className="bg-[#f7f7fc] text-[11px] uppercase tracking-[.16em] text-[#7c8498]">
+        <thead className="bg-[#f7f7f7] text-[11px] uppercase tracking-[.16em] text-[#7c8498]">
           <tr>
             {headers.map(x => (
               <th key={x} className="whitespace-nowrap px-4 py-3 font-bold">
@@ -275,7 +275,7 @@ function Empty({ title, detail }: { title: string; detail: string }) {
 }
 function Pill({ value }: { value: unknown }) {
   return (
-    <span className="inline-flex rounded-full border border-[#ead8c6] bg-[#f3f0ff] px-2.5 py-1 text-[11px] font-semibold capitalize text-[#5145b8]">
+    <span className="people-status-pill inline-flex rounded-full border px-2.5 py-1 text-[11px] font-semibold capitalize">
       {String(value ?? "—").replaceAll("_", " ")}
     </span>
   );
@@ -310,16 +310,8 @@ function Kpi({
   note?: string;
   accent?: string;
 }) {
-  const c: any = {
-    berry: "bg-[#6c5ce7]",
-    caramel: "bg-[#f0a34b]",
-    green: "bg-[#47a67b]",
-  };
   return (
-    <div className="relative overflow-hidden rounded-2xl border border-[#e7e7f0] bg-white p-5">
-      <div
-        className={`absolute left-0 top-0 h-full w-1 ${c[accent] ?? c.berry}`}
-      />
+    <div className="people-kpi-card relative overflow-hidden rounded-2xl border border-[#e7e7f0] bg-white p-5">
       <p className="text-xs font-bold uppercase tracking-[.14em] text-[#7c8498]">
         {label}
       </p>
@@ -330,7 +322,7 @@ function Kpi({
 }
 function DateFilter({ from, to, setFrom, setTo }: Any) {
   return (
-    <div className="flex flex-wrap items-end gap-2 rounded-2xl border border-[#e7e7f0] bg-[#ffffff] p-3">
+    <div className="people-date-filter flex flex-wrap items-end gap-2 rounded-2xl border border-[#e7e7f0] bg-[#ffffff] p-3">
       <div className="w-36">
         <Field
           label="From"
@@ -4277,6 +4269,9 @@ function Home() {
             <strong>{currentTitle}</strong>
           </div>
           <div className="reference-topbar-actions">
+            <div className="reference-topbar-search">
+              ⌕ <span>Search anything...</span>
+            </div>
             <button aria-label="Toggle theme">
               <Moon size={17} />
             </button>
@@ -4289,6 +4284,9 @@ function Home() {
             >
               <ShieldCheck size={15} /> Lock PIN access
             </button>
+            <div className="reference-avatar">
+              {(user.name || user.email || "C").slice(0, 1).toUpperCase()}
+            </div>
           </div>
         </header>
         <main className="reference-main-content">{content}</main>
