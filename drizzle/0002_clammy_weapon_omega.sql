@@ -1,0 +1,2 @@
+ALTER TABLE `sales` MODIFY COLUMN `deliveryStatus` enum('not_required','pending','assigned','delivered','returned','discrepancy') NOT NULL DEFAULT 'pending';--> statement-breakpoint
+ALTER TABLE `deliveryLines` ADD `deliveredPacks` int DEFAULT 0 NOT NULL;

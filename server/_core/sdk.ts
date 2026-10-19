@@ -316,13 +316,32 @@ class SDKServer {
     if (!user) {
       throw ForbiddenError("User not found");
     }
+    let authenticatedUser = user;
+
+    // A user created before the protected owner address was configured may
+    // have no email persisted. Refresh only that pending account's OAuth
+    // identity; failure leaves it pending and never falls back to first-login
+    // ownership.
+    if (authenticatedUser.role === "pending" && !authenticatedUser.email && ENV.candyOwnerEmail) {
+      try {
+        const userInfo = await this.getUserInfoWithJwt(sessionToken ?? "");
+        if (userInfo.email) {
+          await db.upsertUser({ openId: authenticatedUser.openId, email: userInfo.email });
+          const refreshedUser = await db.getUserByOpenId(authenticatedUser.openId);
+          if (refreshedUser) authenticatedUser = refreshedUser;
+        }
+      } catch {
+        console.warn("[Auth] Pending account email refresh failed; access remains restricted.");
+      }
+    }
 
     await db.upsertUser({
-      openId: user.openId,
+      openId: authenticatedUser.openId,
+      email: authenticatedUser.email,
       lastSignedIn: signedInAt,
     });
 
-    return user;
+    return authenticatedUser;
   }
 }
 

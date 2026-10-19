@@ -1,0 +1,61 @@
+# Candy Distribution Manager — Implementation Plan
+
+## Approved scope and architecture
+
+Build an independent, responsive operations and accounting web application for the user's Philippines candy-distribution business. It will use the initialized WebDev React/TypeScript frontend, Express/tRPC server, Drizzle ORM, and project-scoped managed MySQL database. Its OAuth identity, application permissions, transactional tables, runtime configuration, and release history are separate from the cigarette buy-and-sell manager. Server procedures enforce permissions; the interface never serves as the only access control.
+
+Preserve the supplied twelve-section navigation: Dashboard; Products; Purchases; Sales and Store Accounts; Inventory; Deliveries and Operator; Cash Ledger; Expenses; Investor and Capital; Profit and Reinvestment; Weekly Reports; Settings and Audit Log. Operational screens are designed for rapid pack-level data entry, searchable records, filters, and printable/exportable views. The installed project's tRPC/Drizzle stack and its OAuth implementation are the dependencies; no external business connector or separate database is introduced.
+
+### Data and transaction boundaries
+
+Use additive Drizzle schema migrations for the candy application's business records while retaining the starter's OAuth user table. The data model will connect product and party records to purchase/sale headers and lines, payment/collection records, inventory movements, delivery assignments and reconciliation, cash-location movements/transfers, expenses and cost allocations, capital/ownership entries, business settings, and append-only audit events. Store money as exact decimal/currency values and use database transactions for each multi-record business posting. Give posted records stable IDs and idempotency keys where duplicate submissions could otherwise duplicate a collection or posting.
+
+Inventory is pack-based, disallows a negative available quantity, and changes only through a posted receipt or a documented movement: sale, customer return, supplier return, damage, count, or authorized adjustment. Moving weighted-average cost per product incorporates landed acquisition cost; purchase-level freight/other cost is consistently allocated to lines by line acquisition value and recorded with the receipt. The average-cost/quantity basis used for a sale or return is recorded in the movement history so that COGS and reports can be traced after costs change. Completed movements are immutable; corrections are reversals/adjustments with actor, time, reason, and links to the original movement.
+
+A purchase order is not stock. Receipt posts the inventory increase and landed cost. A posted sale recognizes earned revenue independently of payment; each actual collection/refund is a separate linked cash/receivable event. Partial payment leaves a receivable. Customer returns link to the original sale and record whether packs are saleable/restocked or damaged; supplier returns, stock count and damage use explicit movements. A delivery ties assigned packs, stores, linked sales, returned packs, collections, expenses, remittance, shortages, and outstanding balance together. Collection submissions are unique/idempotent. Cash is tracked by owner-held, operator-held, and business-account locations; transfers are balanced movements, never revenue/expense.
+
+Expenses distinguish acquisition costs from operating costs. The shared Hyundai H100 policy captures the actual invoice amount, business-purpose share, documented allocation basis, and any external/shared reference so a cost is not duplicated across businesses. Ownership has effective dates and explicit authorized percentages; Gale begins as sole investor. Nikkie is not pre-added as an investor or owner. Capital deposits/withdrawals and profit distributions are actual transactions, distinct from sales and profits. Revenue, COGS, gross profit, operating expense, net profit, cash, inventory, receivables, liabilities, capital, retained earnings, sell-through and reinvestment estimates derive from posted transactions and movements; purchases of stock are not operating expenses before sale, and estimated reinvestment reconciles the relevant balance-sheet components rather than subtracting purchases/distributions from sales.
+
+Record the stated PHP 25,000 as the initial purchasing-budget target and Divisoria, Philippines as the initial sourcing location in business settings, not as a fabricated cash balance, dated capital contribution, purchase or other operational transaction. The approximately one-week turnover is a target to validate against actual sales data, not an assumed performance value. No fake business records are seeded into production. Development and published app share the managed database, so validation uses isolated unit-test fixtures and read-only/code checks; never run business test transactions against that database. Reports clearly label currency, date range, and the difference between money earned and money received.
+
+### Identity, roles, and audit
+
+Use the installed Manus OAuth flow and preserve its session validation, CSRF nonce check, and cross-site `SameSite=None; Secure` session-cookie handling. The initialized template's `OWNER_OPEN_ID` is unset, so the owner identity will be configured via the WebDev protected-input flow as `CANDY_OWNER_EMAIL`; never put its value in chat, source or Git. Match the configured email against the authenticated OAuth identity, fail closed while no owner is configured, and never promote an arbitrary first login. Other accounts receive no operational access until the owner explicitly authorizes an operator. Enforce owner-only procedures for capital, ownership settings, distributions, full financial reports, and global configuration. Operators may perform only explicitly assigned operational tasks (purchases/receipts, deliveries, stock movements, collections and remittance) and cannot access owner-only financial/capital details. Operators may enter purchase proposals for Divisoria sourcing, but no stock receipt or supplier payment is permitted until the owner explicitly approves and assigns the purchase. Owner-created purchase records are authorized by their creation. Maintain an audit trail for creation, posting, reversal, settings and permission changes. Preserve authorized account history when permissions change.
+
+### Design
+
+**Style options considered:**
+
+- Compact Modernist wholesale ledger — probability 0.061.
+- Traditional sari-sari counter book — probability 0.037.
+- Playful pastel confectionery shop — probability 0.014.
+
+**Selected direction: Reference-matched compact business ledger**, updated per the user's later guidance. Use the observable reference language: airy near-white/lavender workspace, white elevated surfaces, compact uppercase labels, blue-violet primary actions, restrained amber status accents, and dense operational tables. Keep the application practical rather than decorative, while adapting the reference workflow to candy packs, stores, and delivery reconciliation. Use the supplied CANDY wordmark as the app logo and favicon; do not substitute the generated mark.
+
+- **Core principles:** transaction truth over decorative totals; legibility for busy wholesale operations; explicit separation of cash, earnings, inventory and capital; full desktop capability with responsive mobile actions.
+- **Color philosophy:** near-white/lavender workspace for low-fatigue operation; blue-violet for primary actions and navigation cues; amber for attention or pending states; semantic green/red reserved for reconciliation and status rather than decoration.
+- **Layout paradigm:** persistent left-side navigation on wide screens and a compact, collapsible mobile navigation; page title, date/filter/action band, then asymmetrical operational panels and full-width record tables. Avoid a generic centered card grid; use a clear primary work surface with contextual summaries.
+- **Signature elements:** pack-quantity chips; precise, tabular PHP figures with separate earned/collected labels; restrained status markers for receipt, delivery and remittance state.
+- **Interaction philosophy:** searchable quick-entry forms, sensible defaults from product/customer records, validation before posting, clear confirmation and trace links, and no one-click destructive action. Empty states explain what real transaction creates a balance.
+- **Animation:** short, quiet transitions for navigation, form feedback and drawers; no decorative looping motion; respect reduced-motion preferences.
+- **Typography system:** use the project's available sans-serif UI stack for dense labels and forms; use tabular numerals for money/quantities and a slightly heavier, high-contrast heading hierarchy. Do not rely on a remote font service for core rendering.
+- **Brand essence:** the practical record desk for a small Filipino wholesale candy route; accurate, steady, accountable.
+- **Brand voice:** direct operational language, not promotional copy. Examples: “Receive packs to update on-hand stock.” “Collected ₱2,000; ₱1,250 remains due.”
+- **Wordmark & logo:** use the user's supplied black CANDY wordmark with candy-cane glyph as the primary brand asset in the sidebar, favicon, and project metadata.
+- **Signature brand color:** clean blue-violet, with a soft amber secondary accent.
+
+### Project structure
+
+- `client/src/App.tsx`: Wouter route map and shared application entry.
+- `client/src/pages/Home.tsx`: authenticated application shell and role-aware sections for the twelve requested navigation destinations, including product, purchase, sale, inventory, delivery, cash, expense, capital, reporting, settings and audit interfaces.
+- `client/src/components/ui/`: installed reusable responsive interface primitives; `client/src/lib/` and `client/src/_core/` hold the typed tRPC client, authentication hooks, currency/date formatting and shared form helpers.
+- `client/public/manus-routes.json`: canonical twelve-route page manifest, synchronized with `App.tsx` and verified from the running server.
+- `server/routers.ts`: root tRPC router; `server/businessRouter.ts` defines the Zod-validated operational procedures grouped by domain; `server/businessHelpers.ts` contains shared transaction, cash, stock and audit helpers.
+- `server/db.ts`: managed MySQL connection and owner-role upsert; `drizzle/schema.ts`, `drizzle/relations.ts`, and additive `drizzle/*.sql` migrations define the separate business tables.
+- `server/_core/`: existing Manus OAuth/session, request context, Express and health endpoint, with server-side owner/operator permission middleware.
+- `shared/finance.ts`: deterministic centavo, landed-cost, weighted-average, return, pack, remittance, cash-variance, expense-adjustment and reinvestment helpers.
+- `server/*.test.ts`: isolated unit/auth tests using non-production fixtures for financial calculations and guardrails; no business test data is written to the shared managed database.
+
+### Delivery and constraints
+
+Use the existing WebDev managed preview/runtime and its database; preserve the initialized port 3000 and `/api/health` deployment endpoint. TypeScript host-managed diagnostics are already registered. Create the `/manus-routes.json` static declaration from the real Wouter route source before the first dev-server start. Build and type-check with the project's pinned pnpm toolchain. Keep automatic publication disabled unless the user changes that setting; distinguish preview/checkpoint from successful publication. Before checkpointing, supply the WebDev project logo metadata using a durable HTTPS asset. Inspect the new application against the requested behavior without writing test data to the shared database, then report incomplete functionality or known constraints rather than asserting unverified features.

@@ -8,6 +8,27 @@
       "when": 1788785580464,
       "tag": "0000_initial_users",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1792388631074,
+      "tag": "0001_wealthy_rattler",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1792389305344,
+      "tag": "0002_clammy_weapon_omega",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "5",
+      "when": 1792389757689,
+      "tag": "0003_white_sleeper",
+      "breakpoints": true
     }
   ]
 }
