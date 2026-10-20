@@ -1,6 +1,7 @@
 import { useAuth } from "@/_core/hooks/useAuth";
 import { trpc } from "@/lib/trpc";
 import { formatPHP, parseMoneyToCents } from "@shared/finance";
+import { startLogin } from "@/const";
 import {
   Archive,
   ArrowDownLeft,
@@ -4077,8 +4078,33 @@ function Home() {
   if (loading) return <Loading />;
   if (!user)
     return (
-      <div className="p-10 text-center">
-        Sign in to use the business ledger.
+      <div className="people-auth-screen">
+        <div className="people-auth-card">
+          <img src="/candy-logo.png" alt="CANDY" className="people-auth-logo" />
+          <p className="people-auth-kicker">BUSINESS MANAGER</p>
+          <h1>Sign in to use the business ledger.</h1>
+          <p className="people-auth-copy">
+            Use your Manus account to access the Candy Distribution Manager.
+            Owner and operator permissions are checked on the server after
+            sign-in.
+          </p>
+          <Button
+            className="people-auth-button"
+            onClick={() => {
+              try {
+                startLogin();
+              } catch (e) {
+                toast.error(err(e));
+              }
+            }}
+          >
+            Sign in with Manus
+          </Button>
+          <p className="people-auth-note">
+            New accounts remain pending until the configured owner approves
+            operator access.
+          </p>
+        </div>
       </div>
     );
   if (user.role !== "owner" && user.role !== "operator")
