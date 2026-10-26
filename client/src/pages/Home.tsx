@@ -146,11 +146,11 @@ function Field({
   ...p
 }: React.InputHTMLAttributes<HTMLInputElement> & { label: string }) {
   return (
-    <label className="people-field grid gap-1.5 text-xs font-bold uppercase tracking-[.12em] text-[#758096]">
+    <label className="corbel-field people-field grid gap-1.5 text-xs font-bold uppercase tracking-[.12em] text-[#758096]">
       <span>{label}</span>
       <input
         {...p}
-        className="h-10 rounded-xl border border-[#deddea] bg-white px-3 text-sm font-normal tracking-normal text-[#202431] outline-none focus:border-[#202431] focus:ring-2 focus:ring-[#202431]/10"
+        className="corbel-control h-10 rounded-xl border border-[#deddea] bg-white px-3 text-sm font-normal tracking-normal text-[#202431] outline-none focus:border-[#202431] focus:ring-2 focus:ring-[#202431]/10"
       />
     </label>
   );
@@ -161,11 +161,11 @@ function SelectField({
   ...p
 }: React.SelectHTMLAttributes<HTMLSelectElement> & { label: string }) {
   return (
-    <label className="people-field grid gap-1.5 text-xs font-bold uppercase tracking-[.12em] text-[#758096]">
+    <label className="corbel-field people-field grid gap-1.5 text-xs font-bold uppercase tracking-[.12em] text-[#758096]">
       <span>{label}</span>
       <select
         {...p}
-        className="h-10 rounded-xl border border-[#deddea] bg-white px-3 text-sm font-normal tracking-normal text-[#202431] outline-none focus:border-[#202431]"
+        className="corbel-control h-10 rounded-xl border border-[#deddea] bg-white px-3 text-sm font-normal tracking-normal text-[#202431] outline-none focus:border-[#202431]"
       >
         {children}
       </select>
@@ -207,7 +207,7 @@ function Button({
   return (
     <button
       {...p}
-      className={`inline-flex h-10 items-center justify-center gap-2 rounded-xl px-3.5 text-sm font-bold disabled:opacity-50 ${s[variant]} ${p.className ?? ""}`}
+      className={`corbel-button inline-flex h-10 items-center justify-center gap-2 rounded-xl px-3.5 text-sm font-bold disabled:opacity-50 ${s[variant]} ${p.className ?? ""}`}
     >
       {children}
     </button>
@@ -225,7 +225,7 @@ function Frame({
   children: ReactNode;
 }) {
   return (
-    <div className="people-page mx-auto max-w-[1480px]">
+    <div className="corbel-page people-page mx-auto max-w-[1480px]">
       <div className="people-page-header mb-6 flex flex-wrap items-end justify-between gap-3">
         <div>
           <p className="people-page-kicker text-xs font-bold uppercase tracking-[.2em] text-[#8b919d]">
@@ -249,7 +249,7 @@ function Table({
   children: ReactNode;
 }) {
   return (
-    <div className="people-table overflow-x-auto rounded-2xl border border-[#e7e7f0] bg-white">
+    <div className="corbel-table people-table overflow-x-auto rounded-2xl border border-[#e7e7f0] bg-white">
       <table className="min-w-full text-left text-sm">
         <thead className="bg-[#f7f7f7] text-[11px] uppercase tracking-[.16em] text-[#7c8498]">
           <tr>
@@ -267,7 +267,7 @@ function Table({
 }
 function Empty({ title, detail }: { title: string; detail: string }) {
   return (
-    <div className="rounded-2xl border border-dashed border-[#d7d9ea] bg-[#fbfbff] px-6 py-12 text-center">
+    <div className="corbel-empty rounded-2xl border border-dashed border-[#d7d9ea] bg-[#fbfbff] px-6 py-12 text-center">
       <Archive className="mx-auto mb-3 text-[#9399ad]" size={26} />
       <p className="font-semibold">{title}</p>
       <p className="mt-1 text-sm text-[#758096]">{detail}</p>
@@ -283,7 +283,7 @@ function Pill({ value }: { value: unknown }) {
 }
 function Loading() {
   return (
-    <div className="flex items-center gap-2 rounded-2xl border border-[#e7e7f0] bg-white px-5 py-10 text-sm text-[#758096]">
+    <div className="corbel-loading flex items-center gap-2 rounded-2xl border border-[#e7e7f0] bg-white px-5 py-10 text-sm text-[#758096]">
       <RefreshCw size={16} className="animate-spin" />
       Loading business data…
     </div>
@@ -291,7 +291,7 @@ function Loading() {
 }
 function Restricted() {
   return (
-    <div className="rounded-2xl border border-[#e7e7f0] bg-white p-8 text-center">
+    <div className="corbel-restricted rounded-2xl border border-[#e7e7f0] bg-white p-8 text-center">
       <BriefcaseBusiness className="mx-auto mb-3 text-[#6c5ce7]" size={28} />
       <h2 className="font-black">Owner access required</h2>
       <p className="mx-auto mt-2 max-w-md text-sm text-[#758096]">
@@ -312,7 +312,7 @@ function Kpi({
   accent?: string;
 }) {
   return (
-    <div className="people-kpi-card relative overflow-hidden rounded-2xl border border-[#e7e7f0] bg-white p-5">
+    <div className="corbel-kpi people-kpi-card relative overflow-hidden rounded-2xl border border-[#e7e7f0] bg-white p-5">
       <p className="text-xs font-bold uppercase tracking-[.14em] text-[#7c8498]">
         {label}
       </p>
@@ -323,7 +323,7 @@ function Kpi({
 }
 function DateFilter({ from, to, setFrom, setTo }: Any) {
   return (
-    <div className="people-date-filter flex flex-wrap items-end gap-2 rounded-2xl border border-[#e7e7f0] bg-[#ffffff] p-3">
+    <div className="corbel-date-filter people-date-filter flex flex-wrap items-end gap-2 rounded-2xl border border-[#e7e7f0] bg-[#ffffff] p-3">
       <div className="w-36">
         <Field
           label="From"

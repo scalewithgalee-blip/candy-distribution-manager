@@ -2435,3 +2435,274 @@
     }
   }
 }
+
+/* Final shared Corbel system: this layer intentionally owns typography and
+   primitives across every authenticated route, not only the dashboard. */
+@layer components {
+  .reference-app-shell,
+  .reference-app-shell * {
+    font-family: Inter, "Helvetica Neue", Arial, sans-serif;
+    font-synthesis: none;
+  }
+  .reference-app-shell {
+    font-size: 13px;
+    line-height: 1.35;
+    letter-spacing: -0.012em;
+  }
+  .reference-app-shell h1,
+  .reference-app-shell h2,
+  .reference-app-shell h3,
+  .reference-app-shell p,
+  .reference-app-shell strong {
+    margin-top: 0;
+  }
+  .reference-app-shell h1,
+  .reference-app-shell h2,
+  .reference-app-shell h3 {
+    color: #10110f !important;
+    font-weight: 600 !important;
+    letter-spacing: -0.045em !important;
+  }
+  .reference-app-shell h1 {
+    font-size: clamp(30px, 3.4vw, 46px) !important;
+    line-height: 1.03 !important;
+  }
+  .reference-app-shell h2 {
+    font-size: 17px !important;
+    line-height: 1.12 !important;
+  }
+  .reference-app-shell h3 {
+    font-size: 14px !important;
+    line-height: 1.18 !important;
+  }
+  .reference-app-shell button,
+  .reference-app-shell a,
+  .reference-app-shell input,
+  .reference-app-shell select,
+  .reference-app-shell textarea {
+    font-family: inherit;
+  }
+  .corbel-page {
+    color: #10110f;
+  }
+  .corbel-page .people-page-header {
+    margin-bottom: 20px !important;
+    align-items: flex-end;
+  }
+  .corbel-page .people-page-header h1 {
+    margin: 4px 0 0 !important;
+  }
+  .corbel-page .people-page-header > div:first-child {
+    min-width: 220px;
+  }
+  .corbel-page .people-page-header > :last-child {
+    max-width: 100%;
+  }
+  .corbel-button {
+    min-height: 34px;
+    border-radius: 17px !important;
+    padding: 0 14px !important;
+    font-size: 10px !important;
+    font-weight: 700 !important;
+    letter-spacing: -0.005em;
+    box-shadow: none !important;
+  }
+  .corbel-button:not([class*="border"]),
+  .corbel-button[class*="bg-[#1d1e22]"] {
+    border: 1px solid #10110f !important;
+    background: #10110f !important;
+    color: #fff !important;
+  }
+  .corbel-button[class*="border"] {
+    border-color: #cfcfca !important;
+    background: #fff !important;
+    color: #10110f !important;
+  }
+  .corbel-field {
+    gap: 5px !important;
+  }
+  .corbel-field > span,
+  .corbel-page label > span {
+    color: #777771 !important;
+    font-size: 8px !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.12em !important;
+    line-height: 1.2;
+  }
+  .corbel-control,
+  .corbel-page input,
+  .corbel-page select,
+  .corbel-page textarea {
+    min-height: 37px;
+    border: 1px solid #d0d0ca !important;
+    border-radius: 10px !important;
+    background: #fff !important;
+    color: #10110f !important;
+    font-size: 11px !important;
+    box-shadow: none !important;
+  }
+  .corbel-control:focus,
+  .corbel-page input:focus,
+  .corbel-page select:focus,
+  .corbel-page textarea:focus {
+    border-color: #10110f !important;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(16, 17, 15, 0.08) !important;
+  }
+  .corbel-page [class*="rounded-2xl"],
+  .corbel-page [class*="rounded-xl"] {
+    border-radius: 17px !important;
+  }
+  .corbel-page [class*="border-[#e7e7f0]"],
+  .corbel-page [class*="border-[#deddea]"],
+  .corbel-page [class*="border-[#d7d9ea]"] {
+    border-color: #d9d9d3 !important;
+  }
+  .corbel-page [class*="bg-white"],
+  .corbel-page [class*="bg-[#ffffff]"],
+  .corbel-page [class*="bg-[#fbfbff]"] {
+    background: rgba(255, 255, 255, 0.84) !important;
+  }
+  .corbel-page [class*="text-[#202431]"],
+  .corbel-page [class*="text-[#1d1f24]"],
+  .corbel-page [class*="text-[#202431]"] {
+    color: #10110f !important;
+  }
+  .corbel-page [class*="text-[#758096]"],
+  .corbel-page [class*="text-[#8b93a6]"],
+  .corbel-page [class*="text-[#7c8498]"],
+  .corbel-page [class*="text-[#8b919d]"],
+  .corbel-page [class*="text-[#9399ad]"] {
+    color: #777771 !important;
+  }
+  .corbel-page [class*="bg-[#eeecff]"],
+  .corbel-page [class*="bg-[#f3f0ff]"],
+  .corbel-page [class*="bg-[#edf8df]"],
+  .corbel-page [class*="bg-[#fff3dc]"],
+  .corbel-page [class*="bg-[#fff0f0]"] {
+    background: #e7e7e2 !important;
+    color: #10110f !important;
+  }
+  .corbel-page [class*="text-[#6c5ce7]"],
+  .corbel-page [class*="text-[#5145b8]"],
+  .corbel-page [class*="text-[#315d30]"],
+  .corbel-page [class*="text-[#a24743]"] {
+    color: #10110f !important;
+  }
+  .corbel-table {
+    overflow: hidden !important;
+    border: 1px solid #d9d9d3 !important;
+    border-radius: 17px !important;
+    background: rgba(255, 255, 255, 0.84) !important;
+  }
+  .corbel-table table {
+    font-size: 11px !important;
+  }
+  .corbel-table thead {
+    background: #e9e9e4 !important;
+    color: #777771 !important;
+  }
+  .corbel-table th {
+    padding: 11px 14px !important;
+    font-size: 8px !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.14em !important;
+  }
+  .corbel-table td {
+    padding: 12px 14px !important;
+    color: #30302c;
+  }
+  .corbel-table tbody {
+    border-color: #e7e7e2 !important;
+  }
+  .corbel-table tbody tr:hover {
+    background: #f5f5f1 !important;
+  }
+  .corbel-empty,
+  .corbel-loading,
+  .corbel-restricted {
+    border-color: #d9d9d3 !important;
+    border-radius: 17px !important;
+    background: rgba(255, 255, 255, 0.84) !important;
+    color: #777771;
+  }
+  .corbel-empty p:first-of-type,
+  .corbel-restricted h2 {
+    color: #10110f !important;
+    font-size: 14px !important;
+    font-weight: 600 !important;
+  }
+  .corbel-empty p:last-of-type,
+  .corbel-restricted p {
+    color: #777771 !important;
+    font-size: 11px !important;
+  }
+  .corbel-kpi {
+    border-color: #d9d9d3 !important;
+    border-radius: 17px !important;
+    background: rgba(255, 255, 255, 0.84) !important;
+    box-shadow: none !important;
+  }
+  .corbel-kpi > p:first-child {
+    color: #777771 !important;
+    font-size: 8px !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.14em !important;
+  }
+  .corbel-kpi > p:nth-child(2) {
+    color: #10110f !important;
+    font-size: 25px !important;
+    font-weight: 600 !important;
+    letter-spacing: -0.05em !important;
+  }
+  .corbel-kpi > p:last-child {
+    color: #777771 !important;
+    font-size: 10px !important;
+  }
+  .corbel-date-filter {
+    border-color: #d9d9d3 !important;
+    border-radius: 17px !important;
+    background: rgba(255, 255, 255, 0.84) !important;
+  }
+  .corbel-panel-header > div {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+  .corbel-panel-header > div > .corbel-panel-title {
+    display: block;
+  }
+  .corbel-panel-header > div > strong {
+    display: block;
+    color: #10110f;
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 1.15;
+    letter-spacing: -0.035em;
+  }
+  .corbel-panel-header > div > small {
+    display: block;
+    color: #777771;
+    font-size: 10px;
+  }
+  .corbel-panel-header > a {
+    align-self: flex-start;
+    margin-top: 2px;
+  }
+  .corbel-recent-panel h2 {
+    margin: 3px 0 4px !important;
+    font-size: 17px !important;
+  }
+  .corbel-recent-panel p {
+    font-size: 10px;
+  }
+  @media (max-width: 680px) {
+    .corbel-page .people-page-header {
+      align-items: flex-start;
+    }
+    .corbel-page .people-page-header h1 {
+      font-size: 31px !important;
+    }
+  }
+}
