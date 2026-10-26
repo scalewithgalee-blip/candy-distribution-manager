@@ -1,5 +1,6 @@
 import { useAuth } from "@/_core/hooks/useAuth";
 import { trpc } from "@/lib/trpc";
+import { useTheme } from "@/contexts/ThemeContext";
 import { formatPHP, parseMoneyToCents } from "@shared/finance";
 import { startLogin } from "@/const";
 import {
@@ -30,6 +31,7 @@ import {
   ShieldCheck,
   ShoppingCart,
   Store,
+  Sun,
   Truck,
   WalletCards,
   X,
@@ -4168,6 +4170,7 @@ function Settings({ user }: Any) {
 }
 function Home() {
   const { loading, user, logout } = useAuth(),
+    { theme, toggleTheme } = useTheme(),
     [location] = useLocation(),
     [mobile, setMobile] = useState(false),
     [moreOpen, setMoreOpen] = useState(true),
@@ -4194,6 +4197,17 @@ function Home() {
     return (
       <div className="people-auth-screen">
         <div className="people-auth-card">
+          <button
+            className="people-auth-theme-toggle"
+            aria-label={
+              theme === "dark"
+                ? "Switch to light theme"
+                : "Switch to dark theme"
+            }
+            onClick={() => toggleTheme?.()}
+          >
+            {theme === "dark" ? <Sun size={15} /> : <Moon size={15} />}
+          </button>
           <img src="/candy-logo.png" alt="CANDY" className="people-auth-logo" />
           <p className="people-auth-kicker">BUSINESS MANAGER</p>
           <h1>Sign in to use the business ledger.</h1>
@@ -4505,8 +4519,15 @@ function Home() {
             <div className="reference-topbar-search">
               ⌕ <span>Search anything...</span>
             </div>
-            <button aria-label="Toggle theme">
-              <Moon size={17} />
+            <button
+              aria-label={
+                theme === "dark"
+                  ? "Switch to light theme"
+                  : "Switch to dark theme"
+              }
+              onClick={() => toggleTheme?.()}
+            >
+              {theme === "dark" ? <Sun size={17} /> : <Moon size={17} />}
             </button>
             <button aria-label="Notifications">
               <Bell size={17} />

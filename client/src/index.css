@@ -2706,3 +2706,378 @@
     }
   }
 }
+
+/* Corbel monochrome dark mode. ThemeProvider adds .dark to <html> and
+   persists the user's choice in localStorage. */
+html.dark {
+  --background: #10110f;
+  --foreground: #f4f4ee;
+  --card: #1b1b17;
+  --card-foreground: #f4f4ee;
+  --popover: #24241f;
+  --popover-foreground: #f4f4ee;
+  --primary: #f4f4ee;
+  --primary-foreground: #10110f;
+  --secondary: #2a2a24;
+  --secondary-foreground: #f4f4ee;
+  --muted: #2a2a24;
+  --muted-foreground: #a3a39b;
+  --accent: #2a2a24;
+  --accent-foreground: #f4f4ee;
+  --border: #3a3a33;
+  --input: #47473f;
+  --ring: #f4f4ee;
+  background: #10110f;
+  color: #f4f4ee;
+}
+
+@layer components {
+  .dark .reference-app-shell {
+    background:
+      radial-gradient(
+        circle at 84% 2%,
+        rgba(55, 55, 48, 0.35) 0,
+        rgba(16, 17, 15, 0) 25rem
+      ),
+      #10110f !important;
+    color: #f4f4ee !important;
+  }
+  .dark .reference-sidebar {
+    background: #24241f !important;
+    box-shadow: 0 13px 28px rgba(0, 0, 0, 0.34);
+  }
+  .dark .reference-nav-item {
+    color: rgba(244, 244, 238, 0.62);
+  }
+  .dark .reference-nav-item:hover {
+    background: #3a3a33;
+    color: #fff;
+  }
+  .dark .reference-nav-active {
+    background: #f4f4ee;
+    color: #10110f;
+  }
+  .dark .reference-nav-active svg {
+    color: #10110f;
+  }
+  .dark .reference-topbar {
+    border-color: #373731 !important;
+    background: rgba(16, 17, 15, 0.91) !important;
+  }
+  .dark .corbel-header-brand {
+    color: #f4f4ee;
+  }
+  .dark .corbel-header-brand span {
+    color: #a3a39b;
+  }
+  .dark .corbel-top-tabs {
+    background: #25251f;
+    border-radius: 20px;
+    padding: 3px;
+  }
+  .dark .corbel-top-tab {
+    color: #aaa9a0;
+  }
+  .dark .corbel-top-tab:hover {
+    background: #3a3a33;
+    color: #fff;
+  }
+  .dark .corbel-top-tab-active,
+  .dark .corbel-top-tab-active:hover {
+    background: #f4f4ee;
+    color: #10110f;
+  }
+  .dark .reference-topbar-search,
+  .dark .reference-topbar-actions > button {
+    border-color: #47473f !important;
+    background: #24241f !important;
+    color: #f4f4ee !important;
+  }
+  .dark .reference-topbar-actions .reference-topbar-lock {
+    background: #f4f4ee !important;
+    color: #10110f !important;
+  }
+  .dark .reference-avatar {
+    border-color: #f4f4ee;
+    background: #24241f;
+    color: #f4f4ee;
+  }
+  .dark .reference-dashboard-heading h1,
+  .dark .corbel-dashboard-heading h1,
+  .dark .corbel-page h1,
+  .dark .corbel-page h2,
+  .dark .corbel-page h3,
+  .dark .corbel-page strong,
+  .dark .corbel-panel-header > div > strong,
+  .dark .corbel-position-legend strong {
+    color: #f4f4ee !important;
+  }
+  .dark .reference-muted,
+  .dark .reference-panel-heading p,
+  .dark .corbel-dashboard-meta,
+  .dark .corbel-panel-header small,
+  .dark .corbel-page-kicker,
+  .dark .corbel-field > span,
+  .dark .corbel-page label > span,
+  .dark .corbel-kpi-label,
+  .dark .corbel-kpi-trend,
+  .dark .corbel-position-legend > div,
+  .dark .corbel-empty,
+  .dark .corbel-loading,
+  .dark .corbel-restricted p {
+    color: #a3a39b !important;
+  }
+  .dark .corbel-dashboard-tabs {
+    background: #2a2a24;
+  }
+  .dark .corbel-dashboard-tab {
+    color: #aaa9a0;
+  }
+  .dark .corbel-dashboard-tab:hover {
+    color: #fff;
+  }
+  .dark .corbel-dashboard-tab-active {
+    background: #fff;
+    color: #10110f;
+  }
+  .dark .corbel-kpi-card,
+  .dark .reference-metric-card,
+  .dark .reference-stat-card,
+  .dark .reference-panel,
+  .dark .people-table,
+  .dark .people-kpi-card,
+  .dark .people-date-filter,
+  .dark .corbel-empty,
+  .dark .corbel-loading,
+  .dark .corbel-restricted {
+    border-color: #3a3a33 !important;
+    background: #1b1b17 !important;
+    color: #f4f4ee !important;
+  }
+  .dark .corbel-kpi-soft {
+    background: #24241f !important;
+  }
+  .dark .corbel-kpi-dark,
+  .dark .corbel-performance-panel,
+  .dark .peopledesk-analytics-card:first-child {
+    border-color: #080907 !important;
+    background: #080907 !important;
+  }
+  .dark .corbel-kpi-card > a {
+    border-color: #44443c;
+    color: #f4f4ee;
+  }
+  .dark .corbel-kpi-trend {
+    color: #aaa9a0 !important;
+  }
+  .dark .corbel-kpi-spark polyline {
+    stroke: #f4f4ee;
+  }
+  .dark .corbel-kpi-ring::before {
+    background: #24241f;
+  }
+  .dark .corbel-kpi-ring span {
+    color: #f4f4ee;
+  }
+  .dark .corbel-kpi-mini-bars i {
+    background: #f4f4ee;
+  }
+  .dark .reference-primary-action,
+  .dark .corbel-button:not([class*="border"]),
+  .dark .corbel-button[class*="bg-[#1d1e22]"] {
+    border-color: #f4f4ee !important;
+    background: #f4f4ee !important;
+    color: #10110f !important;
+  }
+  .dark .reference-secondary-action,
+  .dark .corbel-button[class*="border"] {
+    border-color: #47473f !important;
+    background: #24241f !important;
+    color: #f4f4ee !important;
+  }
+  .dark .reference-period-select,
+  .dark .corbel-control,
+  .dark .corbel-page input,
+  .dark .corbel-page select,
+  .dark .corbel-page textarea {
+    border-color: #47473f !important;
+    background: #24241f !important;
+    color: #f4f4ee !important;
+  }
+  .dark .corbel-table {
+    background: #1b1b17 !important;
+    border-color: #3a3a33 !important;
+  }
+  .dark .corbel-table thead {
+    background: #24241f !important;
+    color: #aaa9a0 !important;
+  }
+  .dark .corbel-table td {
+    color: #e7e7e0 !important;
+  }
+  .dark .corbel-table tbody {
+    border-color: #30302b !important;
+  }
+  .dark .corbel-table tbody tr:hover {
+    background: #24241f !important;
+  }
+  .dark .people-status-pill {
+    border-color: #55554c !important;
+    background: #2a2a24 !important;
+    color: #f4f4ee !important;
+  }
+  .dark .corbel-page [class*="bg-[#eeecff]"],
+  .dark .corbel-page [class*="bg-[#f3f0ff]"],
+  .dark .corbel-page [class*="bg-[#edf8df]"],
+  .dark .corbel-page [class*="bg-[#fff3dc]"],
+  .dark .corbel-page [class*="bg-[#fff0f0]"] {
+    background: #2a2a24 !important;
+    color: #f4f4ee !important;
+  }
+  .dark .corbel-page [class*="text-[#6c5ce7]"],
+  .dark .corbel-page [class*="text-[#5145b8]"],
+  .dark .corbel-page [class*="text-[#315d30]"],
+  .dark .corbel-page [class*="text-[#a24743]"] {
+    color: #f4f4ee !important;
+  }
+  .dark .corbel-activity-panel,
+  .dark .corbel-position-panel,
+  .dark .corbel-revenue-panel {
+    background: #1b1b17;
+    border-color: #3a3a33;
+  }
+  .dark .corbel-panel-title,
+  .dark .corbel-activity-legend,
+  .dark .corbel-activity-grid > span,
+  .dark .corbel-activity-grid > label,
+  .dark .corbel-revenue-column span,
+  .dark .corbel-revenue-column small,
+  .dark .corbel-position-donut span {
+    color: #a3a39b;
+  }
+  .dark .corbel-chart-lines i {
+    border-color: #3a3a33;
+  }
+  .dark .corbel-revenue-column i {
+    background: repeating-linear-gradient(
+      135deg,
+      #5b5b53 0 2px,
+      #282822 2px 5px
+    );
+  }
+  .dark .corbel-position-donut::before {
+    background: #1b1b17;
+  }
+  .dark .corbel-position-donut strong {
+    color: #f4f4ee;
+  }
+  .dark .corbel-dot-light {
+    background: #686860;
+  }
+  .dark .corbel-activity-grid > i {
+    background: #f4f4ee;
+  }
+  .dark .corbel-activity-legend i:nth-of-type(1) {
+    background: #4a4a43;
+  }
+  .dark .corbel-activity-legend i:nth-of-type(2) {
+    background: #77776e;
+  }
+  .dark .corbel-activity-legend i:nth-of-type(3) {
+    background: #b0b0a7;
+  }
+  .dark .corbel-activity-legend i:nth-of-type(4) {
+    background: #f4f4ee;
+  }
+  .dark .people-auth-screen {
+    background: #10110f;
+  }
+  .dark .people-auth-card {
+    border-color: #3a3a33;
+    background: #1b1b17;
+    box-shadow: none;
+  }
+  .dark .people-auth-card h1 {
+    color: #f4f4ee;
+  }
+  .dark .people-auth-copy,
+  .dark .people-auth-note,
+  .dark .people-auth-kicker {
+    color: #a3a39b;
+  }
+  .dark .people-auth-button {
+    background: #f4f4ee !important;
+    color: #10110f !important;
+  }
+  .dark .reference-overlay {
+    background: rgba(0, 0, 0, 0.58);
+  }
+}
+
+@layer components {
+  .people-auth-card {
+    position: relative;
+  }
+  .people-auth-theme-toggle {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    display: grid;
+    width: 30px;
+    height: 30px;
+    place-items: center;
+    border: 1px solid #d0d0ca;
+    border-radius: 50%;
+    background: #f7f7f3;
+    color: #10110f;
+    cursor: pointer;
+  }
+  .people-auth-theme-toggle:hover {
+    border-color: #10110f;
+  }
+  .dark .people-auth-theme-toggle {
+    border-color: #47473f;
+    background: #24241f;
+    color: #f4f4ee;
+  }
+  .dark .people-auth-theme-toggle:hover {
+    border-color: #f4f4ee;
+  }
+}
+
+@layer components {
+  .reference-app-shell,
+  .reference-topbar,
+  .reference-sidebar,
+  .reference-main-content,
+  .reference-panel,
+  .corbel-page,
+  .corbel-table,
+  .corbel-kpi,
+  .corbel-control,
+  .corbel-button,
+  .people-auth-screen,
+  .people-auth-card {
+    transition:
+      background-color 180ms ease,
+      border-color 180ms ease,
+      color 180ms ease,
+      box-shadow 180ms ease;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .reference-app-shell,
+    .reference-topbar,
+    .reference-sidebar,
+    .reference-main-content,
+    .reference-panel,
+    .corbel-page,
+    .corbel-table,
+    .corbel-kpi,
+    .corbel-control,
+    .corbel-button,
+    .people-auth-screen,
+    .people-auth-card {
+      transition: none;
+    }
+  }
+}

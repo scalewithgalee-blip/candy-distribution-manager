@@ -24,7 +24,9 @@ const routes = [
 function Router() {
   return (
     <Switch>
-      {routes.map((path) => <Route key={path} path={path} component={Home} />)}
+      {routes.map(path => (
+        <Route key={path} path={path} component={Home} />
+      ))}
       <Route path="/404" component={NotFound} />
       <Route component={NotFound} />
     </Switch>
@@ -34,7 +36,7 @@ function Router() {
 function App() {
   return (
     <ErrorBoundary>
-      <ThemeProvider defaultTheme="light">
+      <ThemeProvider defaultTheme="light" switchable>
         <TooltipProvider>
           <Toaster />
           <Router />
