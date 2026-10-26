@@ -639,8 +639,13 @@ function Dashboard({
     rows = Array.isArray(salesRows) ? salesRows : [],
     soldPacks = Number(period.soldPacks ?? 0),
     inventoryPacks = Number(position.inventoryPacks ?? 0),
+    revenueCents = Number(period.revenueCents ?? 0),
+    collectionsCents = Number(period.collectionsCents ?? 0),
+    collectionRate = revenueCents
+      ? Math.min(100, (collectionsCents / revenueCents) * 100)
+      : 0,
     velocity = soldPacks / rangeDays,
-    stockoutDays = velocity > 0 ? inventoryPacks / velocity : null,
+    sellThrough = Math.min(100, Number(period.sellThroughBps ?? 0) / 100),
     dateRange = `${dateLabel(from)} – ${dateLabel(to)}`,
     selectedRange = rangeDays <= 8 ? "7" : rangeDays <= 31 ? "30" : "90",
     daily = Array.from({ length: 7 }, (_, index) => {
@@ -655,6 +660,7 @@ function Dashboard({
         label: new Intl.DateTimeFormat("en-PH", { weekday: "short" })
           .format(day)
           .slice(0, 1),
+        orders: dayRows.length,
         revenueCents: dayRows.reduce(
           (sum: number, sale: Any) => sum + Number(sale.totalCents ?? 0),
           0
@@ -675,97 +681,182 @@ function Dashboard({
       };
     }),
     maxRevenue = Math.max(1, ...daily.map(day => day.revenueCents)),
-    maxCollections = Math.max(1, ...daily.map(day => day.collectionsCents)),
-    recentSales = rows.slice(0, 6);
+    cashCents = Number(position.cashTotalCents ?? 0),
+    inventoryValueCents = Number(position.inventoryValueCents ?? 0),
+    receivablesCents = Number(position.accountsReceivableCents ?? 0),
+    positionTotal = Math.max(
+      1,
+      cashCents + inventoryValueCents + receivablesCents
+    ),
+    cashShare = (cashCents / positionTotal) * 100,
+    inventoryShare = (inventoryValueCents / positionTotal) * 100,
+    activityRows = [
+      { label: "Invoices", values: daily.map(day => day.orders) },
+      { label: "Packs", values: daily.map(day => day.packs) },
+      { label: "Cash", values: daily.map(day => day.collectionsCents) },
+      { label: "Sales", values: daily.map(day => day.revenueCents) },
+    ];
 
   return (
-    <div className="reference-dashboard">
-      <div className="reference-dashboard-heading">
+    <div className="reference-dashboard corbel-dashboard">
+      <div className="corbel-dashboard-heading">
         <div>
-          <p className="reference-eyebrow">DASHBOARD</p>
-          <h1>
-            Good morning, team <span className="reference-info">i</span>
-          </h1>
-          <p className="reference-muted">
-            {new Intl.DateTimeFormat("en-PH", {
-              weekday: "long",
-              month: "long",
-              day: "numeric",
-              year: "numeric",
-            }).format(today)}
-            <span> · Shared business ledger</span>
-          </p>
+          <h1>Dashboard</h1>
+          <div
+            className="corbel-dashboard-tabs"
+            role="tablist"
+            aria-label="Dashboard views"
+          >
+            <button
+              className="corbel-dashboard-tab corbel-dashboard-tab-active"
+              role="tab"
+              aria-selected="true"
+            >
+              Overview
+            </button>
+            <Link className="corbel-dashboard-tab" href="/cash">
+              Money
+            </Link>
+            <Link className="corbel-dashboard-tab" href="/inventory">
+              Inventory
+            </Link>
+          </div>
         </div>
-        <div className="reference-action-row">
-          <Link href="/sales" className="reference-primary-action">
-            <Plus size={16} />
-            Add daily sale
+        <div className="corbel-dashboard-meta">
+          <span>◷ {dateRange}</span>
+          <div className="reference-action-row">
+            <Link href="/weekly-reports" className="reference-secondary-action">
+              ⌁ Full analytics
+            </Link>
+            <Link href="/weekly-reports" className="reference-primary-action">
+              ↓ Export
+            </Link>
+          </div>
+        </div>
+      </div>
+
+      <div className="corbel-kpi-grid">
+        <article className="corbel-kpi-card corbel-kpi-dark">
+          <div className="corbel-kpi-label">
+            ACTIVE SALES <span>ⓘ</span>
+          </div>
+          <strong>{money(revenueCents)}</strong>
+          <div className="corbel-kpi-trend">
+            ↑ {num(period.salesCount)} invoices · selected range
+          </div>
+          <Link href="/sales">
+            See sales <span>↗</span>
           </Link>
-          <button
-            className="reference-secondary-action"
-            onClick={() =>
-              toast.info("Daily close is available from the cash ledger.")
-            }
+          <div className="corbel-kpi-bars">
+            <i />
+            <i />
+            <i />
+          </div>
+        </article>
+        <article className="corbel-kpi-card">
+          <div className="corbel-kpi-label">
+            CASH COLLECTED <span>ⓘ</span>
+          </div>
+          <strong>{money(collectionsCents)}</strong>
+          <div className="corbel-kpi-trend">
+            {collectionRate.toFixed(1)}% of recorded sales
+          </div>
+          <Link href="/cash">
+            See cash ledger <span>↗</span>
+          </Link>
+          <svg
+            className="corbel-kpi-spark"
+            viewBox="0 0 92 34"
+            aria-label="Collections trend"
           >
-            <Check size={15} />
-            Close day
-          </button>
-          <button
-            className="reference-secondary-action"
-            onClick={() => toast.info("No prior close has been recorded.")}
+            <polyline points="2,28 18,24 31,27 45,12 59,18 74,7 90,11" />
+          </svg>
+        </article>
+        <article className="corbel-kpi-card corbel-kpi-soft">
+          <div className="corbel-kpi-label">
+            PACKS SOLD <span>ⓘ</span>
+          </div>
+          <strong>{num(soldPacks)}</strong>
+          <div className="corbel-kpi-trend">
+            {velocity
+              ? `${velocity.toFixed(1)} packs/day`
+              : "No sales velocity yet"}
+          </div>
+          <Link href="/inventory">
+            See inventory <span>↗</span>
+          </Link>
+          <div
+            className="corbel-kpi-ring"
+            style={{
+              background: `conic-gradient(#10110f 0 ${sellThrough}%, #c7c7c1 ${sellThrough}% 100%)`,
+            }}
           >
-            <RefreshCw size={15} />
-            Reopen last close
-          </button>
-        </div>
+            <span>{Math.round(sellThrough)}%</span>
+          </div>
+        </article>
+        <article className="corbel-kpi-card corbel-kpi-soft">
+          <div className="corbel-kpi-label">
+            COLLECTION RATE <span>ⓘ</span>
+          </div>
+          <strong>{collectionRate.toFixed(1)}%</strong>
+          <div className="corbel-kpi-trend">
+            {money(position.accountsReceivableCents)} remains receivable
+          </div>
+          <Link href="/sales">
+            See accounts <span>↗</span>
+          </Link>
+          <div className="corbel-kpi-mini-bars">
+            {daily.map(day => (
+              <i
+                key={day.key}
+                style={{
+                  height: `${day.revenueCents ? Math.max(12, (day.collectionsCents / Math.max(1, day.revenueCents)) * 100) : 8}%`,
+                }}
+              />
+            ))}
+          </div>
+        </article>
       </div>
 
-      <div className="reference-card-grid reference-card-grid-four">
-        <article className="reference-metric-card">
-          <div className="reference-metric-heading">
-            <span>TOTAL SALES</span>
-            <CircleDollarSign size={17} />
+      <div className="corbel-main-analytics">
+        <section className="corbel-performance-panel">
+          <div className="corbel-panel-title">
+            SALES PERFORMANCE <span>ⓘ</span>
           </div>
-          <strong>{money(period.revenueCents)}</strong>
-          <small>
-            {num(period.salesCount)} invoices · {num(soldPacks)} packs
-          </small>
-        </article>
-        <article className="reference-metric-card">
-          <div className="reference-metric-heading">
-            <span>GROSS PROFIT</span>
-            <BarChart3 size={17} />
-          </div>
-          <strong>{money(period.grossProfitCents)}</strong>
-          <small>{money(period.cogsCents)} COGS in selected range</small>
-        </article>
-        <article className="reference-metric-card">
-          <div className="reference-metric-heading">
-            <span>INVENTORY</span>
-            <Boxes size={17} />
-          </div>
-          <strong>{num(inventoryPacks)} packs</strong>
-          <small>
-            {money(position.inventoryValueCents)} at weighted-average cost
-          </small>
-        </article>
-        <article className="reference-metric-card">
-          <div className="reference-metric-heading">
-            <span>RECEIVABLES</span>
-            <WalletCards size={17} />
-          </div>
-          <strong>{money(position.accountsReceivableCents)}</strong>
-          <small>{money(position.cashTotalCents)} cash recorded</small>
-        </article>
-      </div>
-
-      <div className="peopledesk-analytics-grid">
-        <section className="reference-panel peopledesk-analytics-card">
-          <div className="reference-panel-heading">
+          <div
+            className="corbel-gauge"
+            style={{
+              background: `conic-gradient(from 270deg, #fff 0 ${sellThrough * 1.35}deg, #3a3a36 ${sellThrough * 1.35}deg 270deg, transparent 270deg)`,
+            }}
+          >
             <div>
-              <p className="reference-panel-kicker">SALES ANALYTICS</p>
-              <h2>Sales rhythm</h2>
-              <p>{dateRange} · daily revenue</p>
+              <strong>{Math.round(sellThrough)}</strong>
+              <span>
+                of 100
+                <br />
+                points
+              </span>
+            </div>
+          </div>
+          <strong className="corbel-performance-status">
+            {sellThrough >= 70 ? "Ahead of plan" : "Building momentum"}
+          </strong>
+          <p>
+            {rows.length
+              ? `Recorded sales are moving at ${velocity.toFixed(1)} packs per day.`
+              : "Record sales to build a live performance score."}
+          </p>
+          <Link href="/weekly-reports">Improve your score</Link>
+        </section>
+
+        <section className="corbel-revenue-panel">
+          <div className="corbel-panel-header">
+            <div>
+              <span className="corbel-panel-title">
+                REVENUE <span>ⓘ</span>
+              </span>
+              <strong>{money(revenueCents)}</strong>
+              <small> in selected period</small>
             </div>
             <select
               className="reference-period-select"
@@ -776,94 +867,117 @@ function Dashboard({
                 setTo(iso(today));
               }}
             >
-              <option value="7">Weekly</option>
+              <option value="7">7 days</option>
               <option value="30">30 days</option>
               <option value="90">90 days</option>
             </select>
           </div>
-          <div className="peopledesk-chart-summary">
-            <strong>{money(period.revenueCents)}</strong>
-            <span>
-              {velocity
-                ? `${velocity.toFixed(1)} packs/day`
-                : "No sales velocity yet"}
-            </span>
-          </div>
-          <div
-            className="peopledesk-bars"
-            aria-label="Daily sales revenue bars"
-          >
-            {daily.map(day => (
-              <div className="peopledesk-bar-column" key={day.key}>
-                <span className="peopledesk-bar-value">
-                  {day.revenueCents ? money(day.revenueCents) : ""}
-                </span>
-                <div className="peopledesk-bar-track">
-                  <i
-                    style={{
-                      height: `${day.revenueCents ? Math.max(8, (day.revenueCents / maxRevenue) * 100) : 0}%`,
-                    }}
-                  />
-                </div>
-                <small>{day.label}</small>
-              </div>
-            ))}
-          </div>
-          {!rows.length && (
-            <p className="peopledesk-chart-empty">
-              No dated sales recorded yet.
-            </p>
-          )}
-        </section>
-
-        <section className="reference-panel peopledesk-analytics-card">
-          <div className="reference-panel-heading">
-            <div>
-              <p className="reference-panel-kicker">CASH ANALYTICS</p>
-              <h2>Collection report</h2>
-              <p>Collections linked to completed sales</p>
+          <div className="corbel-revenue-chart">
+            <div className="corbel-chart-lines">
+              <i />
+              <i />
+              <i />
+              <i />
             </div>
-            <CircleDollarSign size={18} className="reference-purple-text" />
-          </div>
-          <div className="peopledesk-chart-summary">
-            <strong>{money(period.collectionsCents)}</strong>
-            <span>
-              {position.remittanceOutstandingCents
-                ? money(position.remittanceOutstandingCents) +
-                  " operator remittance"
-                : "No outstanding remittance"}
-            </span>
-          </div>
-          <div
-            className="peopledesk-bars peopledesk-bars-compact"
-            aria-label="Daily collection bars"
-          >
             {daily.map(day => (
-              <div className="peopledesk-bar-column" key={day.key}>
-                <span className="peopledesk-bar-value">
-                  {day.collectionsCents ? money(day.collectionsCents) : ""}
-                </span>
-                <div className="peopledesk-bar-track">
-                  <i
-                    className="peopledesk-bar-green"
-                    style={{
-                      height: `${day.collectionsCents ? Math.max(8, (day.collectionsCents / maxCollections) * 100) : 0}%`,
-                    }}
-                  />
-                </div>
+              <div className="corbel-revenue-column" key={day.key}>
+                <span>{day.revenueCents ? money(day.revenueCents) : ""}</span>
+                <i
+                  style={{
+                    height: `${day.revenueCents ? Math.max(7, (day.revenueCents / maxRevenue) * 100) : 0}%`,
+                  }}
+                />
                 <small>{day.label}</small>
               </div>
             ))}
           </div>
-          {!rows.length && (
-            <p className="peopledesk-chart-empty">
-              Collections appear here after payments are recorded.
-            </p>
-          )}
         </section>
       </div>
 
-      <section className="reference-panel peopledesk-table-panel">
+      <div className="corbel-bottom-analytics">
+        <section className="corbel-activity-panel">
+          <div className="corbel-panel-header">
+            <div>
+              <span className="corbel-panel-title">
+                SALES ACTIVITY <span>ⓘ</span>
+              </span>
+              <strong>Daily movement</strong>
+            </div>
+            <span className="corbel-activity-legend">
+              low <i />
+              <i />
+              <i />
+              <i /> high
+            </span>
+          </div>
+          <div className="corbel-activity-grid">
+            <div />
+            {daily.map(day => (
+              <span key={day.key}>{day.label}</span>
+            ))}
+            {activityRows.map(row => {
+              const max = Math.max(1, ...row.values);
+              return (
+                <Fragment key={row.label}>
+                  <label>{row.label}</label>
+                  {row.values.map((value, index) => (
+                    <i
+                      key={`${row.label}-${daily[index].key}`}
+                      style={{
+                        opacity: value ? 0.25 + (value / max) * 0.75 : 0.12,
+                      }}
+                      aria-label={`${row.label} ${daily[index].label}: ${value}`}
+                    />
+                  ))}
+                </Fragment>
+              );
+            })}
+          </div>
+        </section>
+        <section className="corbel-position-panel">
+          <div className="corbel-panel-header">
+            <div>
+              <span className="corbel-panel-title">
+                BUSINESS POSITION <span>ⓘ</span>
+              </span>
+              <strong>Working capital mix</strong>
+            </div>
+            <Link href="/profit">View report ↗</Link>
+          </div>
+          <div className="corbel-position-content">
+            <div
+              className="corbel-position-donut"
+              style={{
+                background: `conic-gradient(#10110f 0 ${cashShare}%, #777771 ${cashShare}% ${cashShare + inventoryShare}%, #d1d1cb ${cashShare + inventoryShare}% 100%)`,
+              }}
+            >
+              <div>
+                <strong>{money(position.workingCapitalCents)}</strong>
+                <span>working capital</span>
+              </div>
+            </div>
+            <div className="corbel-position-legend">
+              <div>
+                <i className="corbel-dot-dark" />
+                <span>Cash</span>
+                <strong>{money(cashCents)}</strong>
+              </div>
+              <div>
+                <i className="corbel-dot-mid" />
+                <span>Inventory</span>
+                <strong>{money(inventoryValueCents)}</strong>
+              </div>
+              <div>
+                <i className="corbel-dot-light" />
+                <span>Receivables</span>
+                <strong>{money(receivablesCents)}</strong>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <section className="reference-panel peopledesk-table-panel corbel-recent-panel">
         <div className="reference-panel-heading">
           <div>
             <p className="reference-panel-kicker">OPERATIONS</p>
@@ -886,8 +1000,8 @@ function Dashboard({
               "Action",
             ]}
           >
-            {recentSales.length ? (
-              recentSales.map((sale: Any) => {
+            {rows.length ? (
+              rows.slice(0, 6).map((sale: Any) => {
                 const packs = (sale.lines ?? []).reduce(
                   (sum: number, line: Any) => sum + Number(line.packs ?? 0),
                   0
@@ -4225,7 +4339,8 @@ function Home() {
     ),
     extraNav = nav.filter(
       (x: Any) => !primaryPaths.includes(x.path) && (!x.owner || owner)
-    );
+    ),
+    allNav = nav.filter((x: Any) => !x.owner || owner);
   return (
     <div className="reference-app-shell">
       <aside
@@ -4366,7 +4481,7 @@ function Home() {
             <span>BUSINESS LEDGER</span>
           </Link>
           <nav className="corbel-top-tabs" aria-label="Primary workspace">
-            {primaryNav.map(x => (
+            {allNav.map(x => (
               <Link
                 key={x.path}
                 href={x.path}
