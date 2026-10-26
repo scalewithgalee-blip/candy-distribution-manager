@@ -4056,7 +4056,7 @@ function Home() {
   const { loading, user, logout } = useAuth(),
     [location] = useLocation(),
     [mobile, setMobile] = useState(false),
-    [moreOpen, setMoreOpen] = useState(false),
+    [moreOpen, setMoreOpen] = useState(true),
     [from, setFrom] = useState(iso(fromDate)),
     [to, setTo] = useState(iso(today)),
     api = useApi(),
@@ -4225,8 +4225,7 @@ function Home() {
     ),
     extraNav = nav.filter(
       (x: Any) => !primaryPaths.includes(x.path) && (!x.owner || owner)
-    ),
-    currentTitle = nav.find(x => x.path === location)?.label ?? "Dashboard";
+    );
   return (
     <div className="reference-app-shell">
       <aside
@@ -4362,10 +4361,31 @@ function Home() {
           >
             <Menu size={18} />
           </button>
-          <div className="reference-topbar-title">
-            <span>WORKSPACE</span>
-            <strong>{currentTitle}</strong>
-          </div>
+          <Link href="/" className="corbel-header-brand">
+            <img src="/candy-logo.png" alt="CANDY" />
+            <span>BUSINESS LEDGER</span>
+          </Link>
+          <nav className="corbel-top-tabs" aria-label="Primary workspace">
+            {primaryNav.map(x => (
+              <Link
+                key={x.path}
+                href={x.path}
+                className={`corbel-top-tab ${location === x.path ? "corbel-top-tab-active" : ""}`}
+              >
+                {x.path === "/"
+                  ? "Dashboard"
+                  : x.path === "/weekly-reports"
+                    ? "Reports"
+                    : x.path === "/sales"
+                      ? "Sales"
+                      : x.path === "/cash"
+                        ? "Money"
+                        : x.path === "/settings"
+                          ? "Settings"
+                          : x.label}
+              </Link>
+            ))}
+          </nav>
           <div className="reference-topbar-actions">
             <div className="reference-topbar-search">
               ⌕ <span>Search anything...</span>

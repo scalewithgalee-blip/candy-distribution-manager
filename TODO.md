@@ -63,7 +63,8 @@ Implementation outcomes and full acceptance criteria from the approved plan and 
 ## 11. Interface, navigation, and mobile use
 
 - [x] Main navigation covers Dashboard; Products; Purchases; Sales and Store Accounts; Inventory; Deliveries and Operator; Cash Ledger; Expenses; Investor and Capital; Profit and Reinvestment; Weekly Reports; and Settings and Audit Log.
-- [x] Create a clean, responsive interface for desktop and mobile. Use the cigarette manager as inspiration for visual consistency, but adapt terminology and workflows for candy packs and retail-store deliveries. Prioritize fast transaction entry, clear financial summaries, searchable records, date/product filters, and printable/exportable reports.
+- [x] Create a clean, responsive interface for desktop and mobile. Adapt terminology and workflows for candy packs and retail-store deliveries. Prioritize fast transaction entry, clear financial summaries, searchable records, date/product filters, and printable/exportable reports.
+- [x] Apply the supplied Corbel live-preview visual direction across every routed page without changing Candy business workflows: monochrome off-white/charcoal surfaces; horizontal primary route tabs; a floating dark icon dock that retains direct access to every module; high-contrast black key-metric and analytics cards; frosted white data panels; compact dense tables; and responsive mobile navigation. Do not copy the proprietary Corbel template source.
 - [x] Provide transaction-specific, honest empty states. Do not use fabricated sample figures as real business records. Keep demo data clearly separated from production data.
 
 ## 12. Audit, validation, and truthful delivery
@@ -77,4 +78,4 @@ Implementation outcomes and full acceptance criteria from the approved plan and 
 - [x] Managed MySQL migrations were applied additively; required business tables are present and all operational record tables were verified empty before handoff.
 - [x] `pnpm check`, `pnpm test` (15 isolated finance/auth tests), `pnpm build`, route-manifest delivery, Preview root, and `/api/health` all succeeded.
 - [x] Isolated test fixtures cover exact PHP-centavo arithmetic, landed-cost allocation, weighted-average costing, pack stock, partial receivables, returns, remittances, cash variance, reinvestment capacity, and expense-adjustment limits. No test transaction was written to the shared operational database.
-- [x] The final interface uses the supplied CANDY logo in the sidebar, favicon, and project metadata, with the publicly observable white/lavender and blue-violet visual language of the provided reference.
+- [x] The final interface uses the supplied CANDY logo in the utility dock/header, favicon, and project metadata, with the Corbel live-preview-inspired monochrome visual language applied through original project CSS and components.

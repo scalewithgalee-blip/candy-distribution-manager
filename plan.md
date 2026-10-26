@@ -30,19 +30,19 @@ Use the installed Manus OAuth flow and preserve its session validation, CSRF non
 - Traditional sari-sari counter book — probability 0.037.
 - Playful pastel confectionery shop — probability 0.014.
 
-**Selected direction: PeopleDesk-inspired compact admin dashboard**, updated to the supplied Dribbble reference. Match its app-wide language rather than only its palette: a narrow white sidebar with black active navigation, a pale gray workspace/top bar, compact search and profile controls, small uppercase metadata, low-radius white cards, dense tables, black primary actions, and restrained lime-green success accents. Apply the same system to the dashboard, catalog, purchasing, sales, inventory, delivery, cash, expense, capital, reporting, and settings routes. Keep the business content candy-specific and financially truthful. Use the supplied CANDY wordmark as the app logo and favicon.
+**Selected direction: Corbel-inspired monochrome sales workspace**, updated to the supplied live preview. Match its app-wide language rather than only its palette: a black-and-white, lightly textured workspace; compact horizontal page tabs; a floating dark utility dock for every Candy module; frosted white cards with thin neutral borders; a solid near-black key metric and sales-health panel; dense operational tables; and high-contrast, color-independent text statuses. Apply the same system to the dashboard, catalog, purchasing, sales, inventory, delivery, cash, expense, capital, reporting, and settings routes. Keep the business content candy-specific and financially truthful. Use the supplied CANDY wordmark as the app logo and favicon.
 
 - **Core principles:** transaction truth over decorative totals; legibility for busy wholesale operations; explicit separation of cash, earnings, inventory and capital; full desktop capability with responsive mobile actions.
-- **Color philosophy:** pale gray workspace and white surfaces for a quiet admin-console canvas; near-black for active navigation and primary actions; lime green for approved/success states; orange/red reserved for pending, discrepancies and destructive actions.
-- **Layout paradigm:** persistent narrow left navigation with grouped text labels, compact top search/profile bar, then a dense page header, small summary cards, and white tables/panels. Use asymmetry only where it clarifies a report or health rail.
-- **Signature elements:** black active sidebar pill; compact metric cards with small uppercase labels and tiny trend/status notes; lime status pills and lightweight dividers in tables.
+- **Color philosophy:** off-white, charcoal, and neutral-gray surfaces establish calm operational contrast; semantic state is expressed with plain-language labels and border/weight treatment rather than a competing color system.
+- **Layout paradigm:** horizontal route tabs in the top bar make the core workspace immediately scannable, while a floating dark icon dock gives direct access to all modules; content uses a dark primary signal card next to pale analysis panels and compact tables.
+- **Signature elements:** pill-shaped black active route tab; floating black utility dock; solid near-black key-metric card and analytics panel set against frosted white surfaces.
 - **Interaction philosophy:** searchable quick-entry forms, sensible defaults from product/customer records, validation before posting, clear confirmation and trace links, and no one-click destructive action. Empty states explain what real transaction creates a balance.
 - **Animation:** short, quiet transitions for navigation, form feedback and drawers; no decorative looping motion; respect reduced-motion preferences.
-- **Typography system:** use the project's available sans-serif UI stack for dense labels and forms; use tabular numerals for money/quantities and a slightly heavier, high-contrast heading hierarchy. Do not rely on a remote font service for core rendering.
+- **Typography system:** use the project's available sans-serif UI stack for dense labels and forms; use tabular numerals for money/quantities and a compact, high-contrast heading hierarchy. Do not rely on a remote font service for core rendering.
 - **Brand essence:** the practical record desk for a small Filipino wholesale candy route; accurate, steady, accountable.
 - **Brand voice:** direct operational language, not promotional copy. Examples: “Receive packs to update on-hand stock.” “Collected ₱2,000; ₱1,250 remains due.”
 - **Wordmark & logo:** use the user's supplied black CANDY wordmark with candy-cane glyph as the primary brand asset in the sidebar, favicon, and project metadata.
-- **Signature brand color:** near-black admin ink, with a distinctive lime-green success accent.
+- **Signature brand color:** near-black admin ink used as the sole high-emphasis visual signal.
 
 ### Project structure
 
